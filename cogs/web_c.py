@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 import json
 
 
-with open('config.json') as keys:
+with open('data/config.json') as keys:
     config = json.load(keys)
 
 class Posts:

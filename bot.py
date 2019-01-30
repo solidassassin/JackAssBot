@@ -7,7 +7,7 @@ import json
 client = commands.Bot(command_prefix=['jack ', 'Jack '], 
                       description='JackAss is here to piss you off!')
 
-with open('config.json') as keys:
+with open('data/config.json') as keys:
     config = json.load(keys)
 
 
