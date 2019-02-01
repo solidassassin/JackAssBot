@@ -44,12 +44,10 @@ class Beautiful:
 
     def urls(self):
         response = requests.get(f"http://api.giphy.com/v1/gifs/search?api_key={config['giphy']}&q={self.terms}&limit=20").json()
-        data = []
 
-        for i in range(len(response['data'])):
-            data.append(response['data'][i]['images']['original']['url'])
-
+        data = [response['data'][i]['images']['original']['url'] for i in range(len(response['data']))]
         final = random.choice(data)
+        
         return final
 
 
