@@ -1,9 +1,8 @@
 from discord.ext import commands
-import discord
 import random
 import json
 
-class Fun:
+class Fun(commands.Cog):
 
     def __init__(self, client):
         self.client = client

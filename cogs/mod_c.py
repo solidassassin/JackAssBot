@@ -2,7 +2,7 @@ from discord.ext import commands
 import discord
 
 
-class Mod:
+class Mod(commands.Cog):
 
     def __init__(self, client):
         self.client = client
@@ -13,13 +13,11 @@ class Mod:
         aliases=['goodbye', 'die'],
         hidden=True
     )
+    @commands.is_owner()
     async def logout(self, ctx):
-        if ctx.message.author.id == 422042111827902484: # enter your id here
-            await ctx.send('See ya bitch!')
-            await self.client.close()
-        else:
-            await ctx.send("You can't tell me when to leave\n"
-                            "https://www.youtube.com/watch?v=VDzAyiRyOMo")
+        await ctx.send('See ya bitch!')
+        await self.client.close()
+
 
 
     @commands.command(

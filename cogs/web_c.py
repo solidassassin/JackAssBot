@@ -1,5 +1,5 @@
 from discord.ext import commands
-import discord
+from discord import Embed
 import praw # didn't want to bother with reddit's API for now
 import random
 import requests
@@ -24,34 +24,41 @@ class Posts:
         self.subred = subred
         
         
-    def test(self):
+    def test(self):  # TODO: add exception
         subreddit = self.KEY.subreddit(self.subred)
         rPosts = subreddit.hot(limit=50)
-        rPost = random.choice([f'{s.title}\n{s.url}' for s in rPosts])
-        return rPost
+        rPost = random.choice([[s.title, s.url] for s in rPosts])
+        title, link = rPost[0], rPost[1]
+        return title, link
 
 
-class Beautiful:
+class Beautiful:  # TODO: Add scrapping for google search
 
     def __init__(self, terms):
         self.terms = terms
 
     def results(self):
-        data = requests.get(f'http://www.euroleague.net/competition/teams/showteam?clubcode={self.terms}&seasoncode=E2018#!games')
+        data = requests.get(f'http://www.euroleague.net/competition/teams/showteam?clubcode=\
+            {self.terms}&seasoncode=E2018#!games')
         soup = BeautifulSoup(data.text, 'lxml')
         game = soup.find('span', {'class': 'TeamPhaseGamesRecord'})
         return game.text
 
     def urls(self):
-        response = requests.get(f"http://api.giphy.com/v1/gifs/search?api_key={config['giphy']}&q={self.terms}&limit=20").json()
+        try:
+            gifs = requests.get(f"http://api.giphy.com/v1/gifs/search?api_key={config['giphy']}&q=\
+                {self.terms}&limit=20").json()
 
-        data = [response['data'][i]['images']['original']['url'] for i in range(len(response['data']))]
-        final = random.choice(data)
-        
-        return final
+            data = random.choice([[gifs['data'][i]['title'], 
+                gifs['data'][i]['images']['original']['url']] for i in range(len(gifs['data']))])
+
+            title, gif = data[0], data[1]
+            return title, gif
+        except IndexError:  # for when no results are returned
+            pass
 
 
-class Web:
+class Web(commands.Cog):
 
     def __init__(self, client):
         self.client = client
@@ -65,20 +72,36 @@ class Web:
     async def subred(self, ctx, subreddit):
         try:
             p = Posts(f'{subreddit}')
-            await ctx.send(p.test())
-        except:
+            embed1 = Embed(title=p.test()[0], color=0xFF6A33)
+            embed1.set_image(url=p.test()[1])
+            embed1.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+            await ctx.send(embed=embed1)
+            await ctx.message.add_reaction('✅')
+        except Exception:
             await ctx.send('Sorry Chief, did not find a subreddit named like that')
+            await ctx.message.add_reaction('❌')
+
 
     @commands.command(
-    brief='Dispalys a specified gif',
-    description="Outputs the specified gif's url",
-    aliases=['giphy']
+        name='gif',
+        brief='Dispalys a specified gif',
+        aliases=['jif', 'giphy']
     )
-    async def gif(self, ctx, *, gif):
-        g = Beautiful(f'{gif}')
-        await ctx.send(g.urls())
+    async def gif_embed(self, ctx, *, gif):
+        g = Beautiful(gif)
+        gg = g.urls()
+        if gg == None:
+            await ctx.send(f'Sorry <@{ctx.message.author.id}>, no gifs found 😔')
+            await ctx.message.add_reaction('❌')
+        else:
+            e = Embed(title=gg[0], color=0x000000)
+            e.set_image(url=gg[1])
+            e.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
 
+            await ctx.send(embed=e)
+            await ctx.message.add_reaction('✅')
 
+    # TODO: edit the search command to display first results in the channel
     @commands.command(
     brief='Searches given keywords on Google',
     description='Outputs a Google the search result with the given criteria',

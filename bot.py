@@ -4,8 +4,9 @@ import os
 import json
 
 
-client = commands.Bot(command_prefix=['jack ', 'Jack '], 
-                      description='JackAss is here to piss you off!')
+client = commands.Bot(command_prefix=['jack ', 'Jack ', 'jackass ', 'Jackass ', 'JackAss ', 'jackAss '], 
+                      description='JackAss is here to piss you off!',
+                      pm_help=True)
 
 with open('data/config.json') as keys:
     config = json.load(keys)
@@ -18,13 +19,22 @@ async def on_ready():
     return True
 
 
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("Finish your sentece and only then I'll help 😉")
+        await ctx.message.add_reaction('❌')
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.message.add_reaction('⛔')
+
+
 for cog in os.listdir('cogs'):
     filename, filetype = os.path.splitext(cog)
     if '.py' in filetype:
         try:
             client.load_extension(f'cogs.{filename}')
-        except:
-            print(f'{cog} failed to load')
+        except Exception as e:
+            print(f'{cog} failed to load: {e}')
 
 
-client.run(config['token'])
+client.run(config['token'], reconnect=True)
