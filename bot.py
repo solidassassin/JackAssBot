@@ -1,10 +1,10 @@
-from  discord.ext import commands
+from discord.ext import commands
 import discord
 import os
 import json
 
 
-client = commands.Bot(command_prefix=['jack ', 'Jack ', 'jackass ', 'Jackass ', 'JackAss ', 'jackAss '], 
+client = commands.Bot(command_prefix=['jack ', 'Jack ', 'jackass ', 'Jackass'],
                       description='JackAss is here to piss you off!',
                       pm_help=True)
 
@@ -15,8 +15,10 @@ with open('data/config.json') as keys:
 @client.event
 async def on_ready():
     print(f'{client.user} is in!')
-    await client.change_presence(activity=discord.Activity(name='my creator', type=2))
-    return True
+    await client.change_presence(
+        activity=discord.Streaming(
+            name='dangerous stunts!',
+            url='https://www.twitch.tv/twitchrivals'))
 
 
 @client.event
@@ -26,6 +28,8 @@ async def on_command_error(ctx, error):
         await ctx.message.add_reaction('❌')
     if isinstance(error, commands.MissingPermissions):
         await ctx.message.add_reaction('⛔')
+    if isinstance(error, commands.CheckFailure):
+        print('Permissions denied')
 
 
 for cog in os.listdir('cogs'):
@@ -37,4 +41,4 @@ for cog in os.listdir('cogs'):
             print(f'{cog} failed to load: {e}')
 
 
-client.run(config['token'], reconnect=True)
+client.run(config['token'])

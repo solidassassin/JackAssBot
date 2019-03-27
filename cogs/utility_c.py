@@ -1,6 +1,7 @@
 from discord.ext import commands
 import discord
 
+
 class Utility(commands.Cog):
 
     def __init__(self, client):
@@ -14,14 +15,15 @@ class Utility(commands.Cog):
     async def emote(self, ctx, emoji: discord.Emoji):
         e = discord.Embed(color=discord.Color.gold())
         e.set_image(url=emoji.url)
-        e.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+        e.set_footer(text=ctx.author.display_name,
+                     icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
         await ctx.message.add_reaction('✅')
 
     @emote.error
     async def info_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send("I don't do well with Unicode emotes, so STOP IT!")
+            await ctx.send("Not a valid emote")
             await ctx.message.add_reaction('❌')
 
     @commands.command(
@@ -32,9 +34,9 @@ class Utility(commands.Cog):
     async def avatar(self, ctx, user: discord.User):
         e = discord.Embed(color=discord.Color.blurple())
         e.set_image(url=user.avatar_url)
-        e.set_footer(text=ctx.author.display_name, icon_url=ctx.author.avatar_url)
+        e.set_footer(text=ctx.author.display_name,
+                     icon_url=ctx.author.avatar_url)
         await ctx.send(embed=e)
-
 
     @commands.command(
         brief="Pong!",
@@ -45,11 +47,10 @@ class Utility(commands.Cog):
         ping = round(self.client.latency * 1000)
         await ctx.send(f'Pong ```{ping}ms```')
 
-
     @commands.command()
     async def joined(self, ctx, *, member: discord.Member):
         await ctx.send(f'<@{member.id}> joined on {member.joined_at}')
 
-        
+
 def setup(client):
     client.add_cog(Utility(client))
