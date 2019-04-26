@@ -2,11 +2,10 @@ from discord.ext import commands
 
 
 class Owner(commands.Cog):
-
     def __init__(self, client):
         self.client = client
 
-    async def cog_check(self, ctx):  # cog permission check
+    async def cog_check(self, ctx):
         return await ctx.bot.is_owner(ctx.author)
 
     async def cog_command_error(self, ctx, error):

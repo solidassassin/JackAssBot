@@ -15,8 +15,10 @@ class Utility(commands.Cog):
     async def emote(self, ctx, emoji: discord.Emoji):
         e = discord.Embed(color=discord.Color.gold())
         e.set_image(url=emoji.url)
-        e.set_footer(text=ctx.author.display_name,
-                     icon_url=ctx.author.avatar_url)
+        e.set_footer(
+            text=ctx.author.display_name,
+            icon_url=ctx.author.avatar_url
+        )
         await ctx.send(embed=e)
         await ctx.message.add_reaction('✅')
 
@@ -34,8 +36,10 @@ class Utility(commands.Cog):
     async def avatar(self, ctx, user: discord.User):
         e = discord.Embed(color=discord.Color.blurple())
         e.set_image(url=user.avatar_url)
-        e.set_footer(text=ctx.author.display_name,
-                     icon_url=ctx.author.avatar_url)
+        e.set_footer(
+            text=ctx.author.display_name,
+            icon_url=ctx.author.avatar_url
+        )
         await ctx.send(embed=e)
 
     @commands.command(
@@ -49,7 +53,7 @@ class Utility(commands.Cog):
 
     @commands.command()
     async def joined(self, ctx, *, member: discord.Member):
-        await ctx.send(f'<@{member.id}> joined on {member.joined_at}')
+        await ctx.send(f'{member.mention} joined on {member.joined_at}')
 
 
 def setup(client):
