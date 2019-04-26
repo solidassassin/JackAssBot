@@ -1,15 +1,3 @@
-"""
-TODO:
-1. Custom help command  // probs gonna take a while
-3. More management commands
-4. Urban dictionary command  // almost done
-5. New, nsfw cog  // almost done
-6. Better error and check handling
-8. Recatagorize sum shit
-9. A guild leave command  // almost done
-10. A few more owner commands  // almost done
-11. Testing with music commands  // tests working
-"""
 from discord.ext import commands
 from aiohttp import ClientSession
 import discord
