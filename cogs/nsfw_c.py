@@ -27,6 +27,7 @@ class Adult(commands.Cog, name='NSFW'):
         async with self.client.session.get(url) as r:
             if r.status != 200:
                 await ctx.send(f'Bad response {ctx.author.mention} 😔')
+                await ctx.message.add_reaction('❗')
                 return
             hentai = await r.json()
         e = Embed(title='Hentai 😏', color=0xff75f8)
@@ -36,6 +37,7 @@ class Adult(commands.Cog, name='NSFW'):
             icon_url=ctx.author.avatar_url
         )
         await ctx.send(embed=e)
+        await ctx.message.add_reaction('✅')
 
 
 def setup(client):

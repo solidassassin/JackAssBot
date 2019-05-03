@@ -26,11 +26,12 @@ class Web(commands.Cog):
                 await ctx.send(f'Bad response {ctx.author.mention} 😔')
                 return
             gifs = await r.json()
-        if 'data' not in gifs:
+        try:
+            gif = random.choice(gifs['data'])['images']['original']['url']
+        except IndexError:
             await ctx.send(f'Sorry {ctx.author.mention}, no gifs found 😔')
             await ctx.message.add_reaction('❌')
             return
-        gif = random.choice(gifs['data'])['images']['original']['url']
         e = Embed(title='Gif 😉', color=0x000000)
         e.set_image(url=gif)
         e.set_footer(

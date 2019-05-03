@@ -11,8 +11,8 @@ class Mod(commands.Cog):
 
     async def cog_command_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
+            await ctx.send('🖕')
             await ctx.message.add_reaction('⛔')
-            await ctx.send("🖕")
 
     @commands.command(
         brief='Deletes the specified amount of messages',
@@ -20,10 +20,10 @@ class Mod(commands.Cog):
         aliases=['clean', 'delete', 'erase', 'purge']
     )
     async def clear(self, ctx, amount: int):
-        if amount > 200:
+        if amount > 100:
             await ctx.send('Purge limit exceeded')
-        else:
-            await ctx.channel.purge(limit=amount+1)
+            return
+        await ctx.channel.purge(limit=amount+1)
 
 
 def setup(client):

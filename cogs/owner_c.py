@@ -10,13 +10,12 @@ class Owner(commands.Cog):
 
     async def cog_command_error(self, ctx, error):
         if isinstance(error, commands.CheckFailure):
+            await ctx.send('🖕')
             await ctx.message.add_reaction('⛔')
-            await ctx.send("🖕")
 
     @commands.command(
         brief='Disables bot',
-        aliases=['goodbye', 'die'],
-        hidden=True
+        aliases=['goodbye', 'die']
     )
     async def logout(self, ctx):
         await ctx.send('See ya bitch!')
