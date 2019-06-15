@@ -1,27 +1,34 @@
+import logging
+from pathlib import Path
+
+import discord
 from discord.ext import commands
 from aiohttp import ClientSession
-import discord
-import os
-import json
-import logging
+
+from data import config
+from cogs.extras.context import Context
 
 
-class Jackass(commands.Bot):
-    def __init__(self):
-        super().__init__(
-            command_prefix=commands.when_mentioned_or('jack ', 'Jack '),
-            case_insensitive=True,
-            description='JackAss is here to piss you off!'
-        )
-        with open('data/config.json') as keys:
-            self.config = json.load(keys)
-        with open('data/languages.json') as keys:
-            self.languages = json.load(keys)
-        self.session = ClientSession()
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)s: %(name)s -> %(message)s',
+    datefmt='%H:%M:%S'
+)
+log = logging.getLogger(__name__)
+
+
+class JackassBot(commands.Bot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.config = config
+        self.all_cogs = None
+        self.session = None
+        self.BAD_RESPONSE = -1
+        self.NO_RESULTS = -2
+        self.NON_EXISTENT = -3
 
     async def on_ready(self):
-        await self.modules()
-        print(f'{self.user} is in!')
+        log.info(f'{self.user} is in!')
         await self.change_presence(
             activity=discord.Streaming(
                 name='dangerous stunts!',
@@ -29,30 +36,24 @@ class Jackass(commands.Bot):
             )
         )
 
-    async def modules(self):
-        for cog in os.listdir('cogs'):
-            filename, filetype = os.path.splitext(cog)
-            if '.py' in filetype:
-                try:
-                    self.load_extension(f'cogs.{filename}')
-                except Exception as e:
-                    print(f'{cog} failed to load: {e}')
+    async def process_commands(self, message):
+        ctx = await self.get_context(message, cls=Context)
+        await self.invoke(ctx)
 
-    # do a seperate module for error handling
-    async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Finish your sentece and only then I'll help 😉")
-            await ctx.message.add_reaction('❌')
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.message.add_reaction('⛔')
-        if isinstance(error, commands.CheckFailure):
-            print('Permissions denied')
-        else:
-            logging.exception(error)
+    async def load_modules(self):
+        m = list(Path('cogs').glob('*.py'))
+        self.all_cogs = [f'cogs.{i.name}'[:-3] for i in m]
+        for cog in self.all_cogs:
+            try:
+                self.load_extension(cog)
+            except commands.ExtensionError:
+                log.exception(f'Failed to load {cog}')
 
-    def run(self):
-        super().run(self.config['token'])
+    async def start(self):
+        self.session = ClientSession()
+        await self.load_modules()
+        await super().start(self.config.token)
 
-
-if __name__ == "__main__":
-    Jackass().run()
+    async def close(self):
+        await super().close()
+        await self.session.close()

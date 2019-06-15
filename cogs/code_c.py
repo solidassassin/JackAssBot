@@ -1,15 +1,20 @@
-from discord.ext import commands
 import json
+
+from discord.ext import commands
 
 
 with open('data/languages.json') as f:
     languages = json.load(f)
 
 
-class Codeblocks:
-    bad_format = "No code found, make sure you're using codeblocks"
+class Code(commands.Cog):
+    def __init__(self, client):
+        self.client = client
+        self.bad_format = "No code found, make sure you're using codeblocks"
+        self.unsupported = "The specified language is not supported"
+        self.lang_list = sorted(languages.keys())
 
-    def __init__(self, user_input):
+    async def block_cleanup(self, user_input):
         try:
             params = user_input.split('\n', 1)
             language = params[0].strip().lower()
@@ -17,51 +22,67 @@ class Codeblocks:
         except ValueError:
             raise commands.BadArgument(self.bad_format)
 
-        if not block.startswith('```') and not block.endswith('```'):
+        if not (block.startswith('```') and block.endswith('```')):
             raise commands.BadArgument(self.bad_format)
         else:
             block_strip = block.split('\n')[1:-1]
-            self.block_clean = '\n'.join(block_strip)
-        if language not in languages:
-            raise commands.BadArgument(self.bad_format)
+            block_clean = '\n'.join(block_strip)
+        if language not in self.lang_list:
+            return self.unsupported
         else:
-            self.lang = language
-            self.v = languages[language]
-
-
-class Code(commands.Cog):
-
-    def __init__(self, client):
-        self.client = client
+            version = languages[language]
+        return block_clean, language, version
 
     @commands.command(
         name='run',
-        brief='Execute code',
-        aliases=['execute']
+        aliases=('execute', 'code')
     )
-    async def jdoodle(self, ctx, *, code: Codeblocks):
+    async def jdoodle(self, ctx, *, code_raw):
+        """
+        A command to execute your provided code.
+        Example input:
+        *jack run python3
+        \\`\\`\\`[language here]
+        print('Hello world!')
+        \\`\\`\\`*
+        """
+        code = await self.block_cleanup(code_raw)
+        if code == self.unsupported:
+            await ctx.send(
+                f"{self.unsupported}\n" +
+                f"Here's a list of supported languages:\n" +
+                f"```{', '.join(self.lang_list)}```"
+            )
+            return
         payload = {
-            'clientId': self.client.config['clientId'],
-            'clientSecret': self.client.config['clientSecret'],
-            'script': code.block_clean,
-            'language': code.lang,
-            'versionIndex': code.v
+            'clientId': self.client.config.jdoodleClientId,
+            'clientSecret': self.client.config.jdoodleClientSecret,
+            'script': code[0],
+            'language': code[1],
+            'versionIndex': code[2]
         }
         data = json.dumps(payload)
 
         url = 'https://api.jdoodle.com/v1/execute'
-        h = {'content-type': 'application/json'}
+        headers = {'content-type': 'application/json'}
         async with ctx.typing():
-            async with self.client.session.post(url, data=data, headers=h) as r:
+            async with self.client.session.post(
+                url,
+                data=data,
+                headers=headers
+            ) as r:
                 if r.status != 200:
-                    await ctx.send(f'Bad response {ctx.author.mention} 😔')
-                    return
+                    raise commands.CommandInvokeError(
+                        self.client.BAD_RESPONSE
+                    )
                 output = await r.json()
 
             if len(output) > 1990:
-                await ctx.send(f'Sorry {ctx.author.mention}, your output is too long.')
-            else:
-                await ctx.send(f'```\n{output["output"]}\n```')
+                await ctx.send(
+                    f'Sorry {ctx.author.mention}, your output is too long.'
+                )
+                return
+            await ctx.send(f'```\n{output["output"]}\n```')
 
 
 def setup(client):

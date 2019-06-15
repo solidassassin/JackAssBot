@@ -1,76 +1,54 @@
-from discord.ext import commands
-from discord import Embed
-from urllib.parse import quote
 import random
+from urllib.parse import quote
+
+from discord.ext import commands
 
 
 class Web(commands.Cog):
-
+    """
+    Just web shit
+    """
     def __init__(self, client):
         self.client = client
 
-    @commands.command(
-        name='gif',
-        brief='Dispalys a specified gif',
-        aliases=['jif', 'giphy']
-    )
-    async def gif_embed(self, ctx, *, gif):
+    async def giphy_results(self, gif):
         giphy_url = (
             f'http://api.giphy.com/v1/gifs/search' +
-            f'?api_key={self.client.config["giphy"]}' +
+            f'?api_key={self.client.config.giphy}' +
             f'&q={quote(gif)}' +
             f'&lang=en'
         )
         async with self.client.session.get(giphy_url) as r:
             if r.status != 200:
-                await ctx.send(f'Bad response {ctx.author.mention} 😔')
-                return
+                raise commands.CommandInvokeError(
+                    self.client.BAD_RESPONSE
+                )
             gifs = await r.json()
         try:
             gif = random.choice(gifs['data'])['images']['original']['url']
         except IndexError:
-            await ctx.send(f'Sorry {ctx.author.mention}, no gifs found 😔')
-            await ctx.message.add_reaction('❌')
-            return
-        e = Embed(title='Gif 😉', color=0x000000)
-        e.set_image(url=gif)
-        e.set_footer(
-            text=ctx.author.display_name,
-            icon_url=ctx.author.avatar_url
-        )
-        await ctx.send(embed=e)
-        await ctx.message.add_reaction('✅')
+            raise commands.CommandInvokeError(
+                self.client.NO_RESULTS
+            )
+        return gif
 
-    @commands.command(
-        brief="For people who don't know how to use Google",
-        description='Outputs a lmgtfy link with the given criteria'
-    )
-    async def lmgtfy(self, ctx, *, terms):
-        url = f'http://lmgtfy.com/?q={quote(terms)}'
-        e = Embed(title=terms, url=url, color=0x75c5ff)
-        await ctx.send(embed=e)
-
-    @commands.command(
-        brief='Searches Google',
-        aliases=['search', 'find']
-    )
-    async def google(self, ctx, *, crit):
+    async def google_results(self, search):
         goog_url = (
             f'https://www.googleapis.com/customsearch/' +
-            f'v1?q={quote(crit)}' +
-            f'&cx={self.client.config["google_cx"]}' +
-            f'&key={self.client.config["google"]}'
+            f'v1?q={quote(search)}' +
+            f'&cx={self.client.config.google_cx}' +
+            f'&key={self.client.config.google}'
         )
         async with self.client.session.get(goog_url) as r:
             if r.status != 200:
-                await ctx.send(f'Bad response {ctx.author.mention} 😔')
-                await ctx.message.add_reaction('❌')
-                return
+                raise commands.CommandInvokeError(
+                    self.client.BAD_RESPONSE
+                )
             search = await r.json()
         if 'items' not in search:
-            await ctx.send(f'Sorry {ctx.author.mention}, no results found 😔')
-            await ctx.message.add_reaction('❌')
-            return
+            raise commands.CommandInvokeError(
+                self.client.NO_RESULTS
+            )
         if 'cse_thumbnail' in search['items'][0]['pagemap']:
             image = search['items'][0]['pagemap']['cse_thumbnail'][0]['src']
         else:
@@ -80,19 +58,57 @@ class Web(commands.Cog):
         snippet = search['items'][0]['snippet']
         timing = search['searchInformation']['formattedSearchTime']
         results = search['searchInformation']['totalResults']
+        return title, link, snippet, image, results, timing
 
-        e = Embed(
-            title=title, url=link,
-            description=snippet, color=0x4486F4
+# -----------commands--------------
+    @commands.command(
+        name='gif',
+        aliases=('jif', 'giphy')
+    )
+    async def gif_embed(self, ctx, *, gif):
+        """
+        Dispalys a specified gif.
+        """
+        final = await self.giphy_results(gif)
+        await ctx.embed(
+            image=final,
+            color=0x000000
         )
-        if image is not None:
-            e.set_thumbnail(url=image)
-        e.set_footer(
-            text=f'Total results: {results} |' +
-            f' Search time: {timing} seconds'
+
+    @commands.command()
+    async def lmgtfy(self, ctx, *, terms):
+        """
+        For people who don't know how to use Google.
+        A.K.A lmgtfy link
+        """
+        url = f'http://lmgtfy.com/?q={quote(terms)}'
+        await ctx.embed(
+            title=terms,
+            url=url,
+            color=0x000000
         )
-        await ctx.send(embed=e)
-        await ctx.message.add_reaction('✅')
+
+    @commands.command(
+        name='google',
+        aliases=('search', 'find')
+    )
+    async def google(self, ctx, *, criteria):
+        """
+        A Google search of the provided criteria.
+        """
+        async with ctx.typing():
+            info = await self.google_results(criteria)
+            await ctx.embed(
+                title=info[0],
+                url=info[1],
+                description=info[2],
+                color=0x3498db,
+                thumbnail=info[3],
+                footer_text=(
+                    f'Total results: {info[4]} |' +
+                    f' Search time: {info[5]} seconds'
+                )
+            )
 
 
 def setup(client):
