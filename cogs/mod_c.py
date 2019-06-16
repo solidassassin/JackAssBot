@@ -49,6 +49,7 @@ class Mod(commands.Cog):
             {
                 'name': 'Top role:',
                 'value': member.top_role.mention
+                if str(member.top_role) != '@everyone' else '@everyone'
             },
             {
                 'name': 'Joined at:',
