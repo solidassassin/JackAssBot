@@ -61,6 +61,7 @@ class Mod(commands.Cog):
             }
         ]
         await ctx.embed(
+            color=member.color,
             thumbnail=member.avatar_url,
             fields=fields,
             header_text=ctx.guild.name,
