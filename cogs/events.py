@@ -18,7 +18,7 @@ class ErrorHandler(commands.Cog):
         if isinstance(error, commands.CommandOnCooldown):
             await ctx.send(
                 f"You're on cooldown {ctx.author.mention}." +
-                f" Try after `{round(error.retry_after)}s`"
+                f" Try after `{round(error.retry_after, 2)}s`"
             )
             return
 
@@ -28,10 +28,7 @@ class ErrorHandler(commands.Cog):
             return
 
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.invoke(
-                self.client.get_command('help'),
-                term=ctx.command
-            )
+            await ctx.send_help(ctx.command)
             await ctx.message.add_reaction('❌')
             return
 
@@ -44,7 +41,11 @@ class ErrorHandler(commands.Cog):
             return
 
         if isinstance(error, commands.BadArgument):
-            await ctx.send('Invalid argument given.')
+            await ctx.embed(
+                title='Error',
+                description=str(error),
+                color=0xFF0000
+            )
             return
 
         if isinstance(error, commands.CommandInvokeError):

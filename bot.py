@@ -21,7 +21,6 @@ class JackassBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
-        self.all_cogs = None
         self.session = None
         self.BAD_RESPONSE = -1
         self.NO_RESULTS = -2
@@ -40,14 +39,24 @@ class JackassBot(commands.Bot):
         ctx = await self.get_context(message, cls=Context)
         await self.invoke(ctx)
 
-    async def load_modules(self):
+    @property
+    def module_list(self):
         m = list(Path('cogs').glob('*.py'))
-        self.all_cogs = [f'cogs.{i.name}'[:-3] for i in m]
-        for cog in self.all_cogs:
+        all_cogs = [f'cogs.{i.name}'[:-3] for i in m]
+        return all_cogs
+
+    async def load_modules(self):
+        _output = []
+        for cog in self.module_list:
             try:
                 self.load_extension(cog)
-            except commands.ExtensionError:
+                _output.append(f'[{cog}] loaded')
+            except commands.ExtensionAlreadyLoaded:
+                _output.append(f'[{cog}] already loaded')
+            except commands.ExtensionNotLoaded:
+                _output.append(f'[{cog}] not loaded')
                 log.exception(f'Failed to load {cog}')
+        return '\n'.join(_output)
 
     async def start(self):
         self.session = ClientSession()

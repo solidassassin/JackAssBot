@@ -72,7 +72,8 @@ class Web(commands.Cog):
         final = await self.giphy_results(gif)
         await ctx.embed(
             image=final,
-            color=0x000000
+            color=0x000000,
+            footer_default=True
         )
 
     @commands.command()

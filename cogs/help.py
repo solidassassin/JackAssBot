@@ -1,109 +1,116 @@
-"""
-This cog is for the custom help command.
-It's quite messy, because it's temporary.
-Will be replaced when I figure out how the default
- help command mechanism works.
-"""
+import itertools
+
+from discord import Embed
 from discord.ext import commands
 
 
-# so I can pass the command as argument when invoking
-class ToCommand(commands.Converter):
-    async def convert(self, ctx, argument):
-        obj = ctx.bot.get_cog(argument.title())
-        if obj:
-            return obj
-        obj = ctx.bot.get_command(argument.lower())
-        if not obj:
+class CustomHelp(commands.HelpCommand):
+    def __init__(self, **options):
+        super().__init__(**options)
+        self.paginator = None
+        self.spacer = "\u1160 "
+
+    async def send_pages(self, header=False, footer=False):
+        destination = self.get_destination()
+        embed = Embed(
+            color=0x71368a
+        )
+        if header:
+            embed.set_author(
+                name=header,
+                icon_url=self.context.bot.user.avatar_url
+            )
+        for category, entries in self.paginator:
+            embed.add_field(
+                name=category,
+                value=entries,
+                inline=False
+            )
+        if footer:
+            embed.set_footer(
+                text='Use jack help <command/category> for more information.'
+            )
+        await destination.send(embed=embed)
+
+    async def send_bot_help(self, mapping):
+        ctx = self.context
+        bot = ctx.bot
+
+        def get_category(command):
+            cog = command.cog
+            return cog.qualified_name + ':' if cog is not None else 'Help:'
+
+        filtered = await self.filter_commands(
+            bot.commands,
+            sort=True,
+            key=get_category
+        )
+        to_iterate = itertools.groupby(filtered, key=get_category)
+        for cog_name, command_grouper in to_iterate:
+            cmds = sorted(command_grouper, key=lambda c: c.name)
+            category = f'► {cog_name}'
+            if len(cmds) == 1:
+                entries = f'{self.spacer}**{cmds[0].name}** → {cmds[0].short_doc}'
+            else:
+                entries = ' | '.join(f'**{command.name}**' for command in cmds)
+                entries = self.spacer + entries
+            self.paginator.append((category, entries))
+        await self.send_pages(header='Help', footer=True)
+
+    async def send_cog_help(self, cog):
+        filtered = await self.filter_commands(cog.get_commands(), sort=True)
+        if not filtered:
+            await self.context.send(
+                'No commands in this cog.'
+            )
             return
-        return obj
+        category = f'▼ {cog.qualified_name}'
+        entries = '\n'.join(
+            self.spacer +
+            f'**{command.name}** → {command.short_doc or command.description}'
+            for command in filtered
+        )
+        self.paginator.append((category, entries))
+        await self.send_pages(header='Commands', footer=True)
+
+    async def send_group_help(self, group):
+        filtered = await self.filter_commands(group.commands, sort=True)
+        if not filtered:
+            await self.context.send('No public commands in group.')
+            return
+        category = f'**{group.name}** - {group.description or group.short_doc}'
+        entries = '\n'.join(
+            self.spacer + f'**{command.name}** → {command.short_doc}'
+            for command in filtered
+        )
+        self.paginator.append((category, entries))
+        await self.send_pages(header='Commands', footer=True)
+
+    async def send_command_help(self, command):
+        signature = self.get_command_signature(command)
+        helptext = command.help or command.description or 'No help provided.'
+        self.paginator.append((signature,  helptext))
+        await self.send_pages(header='Description')
+
+    async def prepare_help_command(self, ctx, command=None):
+        self.paginator = []
+        await super().prepare_help_command(ctx, command)
 
 
-# add group support for future
-class CustomHelp(commands.Cog, name='Help'):
+class Help(commands.Cog):
     def __init__(self, client):
         self.client = client
-
-    async def check_command(self, term, owner):
-        if term.hidden and not owner:
-            raise commands.CommandInvokeError(
-                self.client.NON_EXISTENT
-            )
-        if term.help:
-            return term.help
-        return 'No info provided.'
-
-    async def check_cog(self, term, owner) -> str:
-        if owner:
-            cog_commands = [
-                '**{} →** {}'.format(i.name, i.help.split('\n')[0])
-                for i in term.get_commands() if i.help
-            ]
-        else:
-            cog_commands = [
-                '**{} →** {}'.format(i.name, i.help.split('\n')[0])
-                for i in term.get_commands() if not i.hidden and i.help
-            ]
-        if not cog_commands:
-            raise commands.CommandInvokeError(
-                self.client.NON_EXISTENT
-            )
-        return '\n'.join(cog_commands)
-
-    async def fetch_help(self, owner):
-        fields = []
-        for name, cog in self.client.cogs.items():
-            if owner:
-                cog_commands = [i.name for i in cog.get_commands()]
-            else:
-                cog_commands = [
-                    i.name for i in cog.get_commands() if not i.hidden
-                ]
-            if not cog_commands:
-                continue
-            fields.append(
-                {
-                    'name': f'► {name}',
-                    'value': f'**{" | ".join(cog_commands)}**',
-                    'inline': False
-                }
-            )
-        return fields
-
-    @commands.command(
-        name='help',
-        aliases=('info', 'commands')
-    )
-    async def custom_help(self, ctx, term: ToCommand = None):
-        """
-        This is it!
-        """
-        owner = await self.client.is_owner(ctx.author)
-        if term:
-            if isinstance(term, commands.Cog):
-                fields = [
-                    {
-                        'name': f'▼ {term.qualified_name}',
-                        'value': await self.check_cog(term, owner)
-                    }
-                ]
-            else:
-                fields = [
-                    {
-                        'name': f'{term.name} {term.signature}',
-                        'value': await self.check_command(term, owner)
-                    }
-                ]
-        else:
-            fields = await self.fetch_help(owner)
-        await ctx.embed(
-            fields=fields,
-            header_text='Commands',
-            header_icon=ctx.me.avatar_url,
-            footer_text='Use jack help <command/category> for more info.'
+        self.client.help_command = CustomHelp(
+            command_attrs={
+                'aliases': ('info', 'commands'),
+                'help': 'This message.'
+            }
         )
+
+    def cog_unload(self):
+        self.client.get_command('help').hidden = False
+        self.client.help_command = commands.DefaultHelpCommand()
 
 
 def setup(client):
-    client.remove_command('help')
-    client.add_cog(CustomHelp(client))
+    client.add_cog(Help(client))

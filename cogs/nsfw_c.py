@@ -55,7 +55,8 @@ class Adult(commands.Cog, name='NSFW'):
         await ctx.embed(
             title='Hentai 😏',
             color=0xff75f8,
-            image=hentai['url']
+            image=hentai['url'],
+            footer_default=True
         )
 
     @commands.command(
@@ -73,7 +74,8 @@ class Adult(commands.Cog, name='NSFW'):
         await ctx.embed(
             title='Teen 😉',
             color=0xf4428f,
-            image=pic
+            image=pic,
+            footer_default=True
         )
 
 

@@ -42,18 +42,10 @@ class Utility(commands.Cog):
             example = example.replace(i, '')
         if len(definition) > 1024:
             definition = f'{definition[:1020]}...'
-        fields = [
-            {
-                'name': 'Definition:',
-                'value': definition,
-                'inline': False
-            },
-            {
-                'name': 'Example:',
-                'value': example,
-                'inline': False
-            }
-        ]
+        fields = {
+            'Definition:': definition,
+            'Example:': example,
+        }
         return fields
 
     @commands.command(
@@ -66,7 +58,8 @@ class Utility(commands.Cog):
         """
         await ctx.embed(
             color=0xffff00,
-            image=emoji.url
+            image=emoji.url,
+            footer_default=True
         )
     # fix dis
     @emote.error
@@ -84,7 +77,8 @@ class Utility(commands.Cog):
         Returns an image of the user's avatar
         """
         await ctx.embed(
-            image=user.avatar_url
+            image=user.avatar_url,
+            footer_default=True
         )
 
     @commands.command(
@@ -95,12 +89,11 @@ class Utility(commands.Cog):
         """
         Latency of the bot in miliseconds.
         """
-        ping = round(self.client.latency * 1000)
-        await ctx.send(f'Pong ```{ping}ms```')
-    # remove when member info command is finished
-    @commands.command()
-    async def joined(self, ctx, *, member: discord.Member):
-        await ctx.invoke(self.client.get_command('help'))
+        ping = round(self.client.latency * 1000, 2)
+        await ctx.embed(
+            title=f'Pong!',
+            description=f'🏓 `{ping}ms`'
+        )
 
     @commands.command(
         name='char',
@@ -128,7 +121,9 @@ class Utility(commands.Cog):
             title=term.title(),
             url=url,
             color=0x1D2439,
-            fields=fields
+            fields=fields,
+            inline=False,
+            footer_default=True
         )
 
 
