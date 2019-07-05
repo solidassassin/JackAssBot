@@ -5,14 +5,10 @@ from discord import Member
 class GuildConv(commands.Converter):
     async def convert(self, ctx, guild):
         if guild.isdigit():
-            return next(
-                (i for i in ctx.bot.guilds if int(guild) == i.id),
-                None
-            )
-        return next(
-            (i for i in ctx.bot.guilds if guild == i.name),
-            None
-            )
+            gen = (i for i in ctx.bot.guilds if int(guild) == i.id)
+            return next(gen, None)
+        gen = (i for i in ctx.bot.guilds if guild == i.name)
+        return next(gen, None)
 
 
 class Mod(commands.Cog):
