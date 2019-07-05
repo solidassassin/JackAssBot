@@ -2,6 +2,19 @@ from discord.ext import commands
 from discord import Member
 
 
+class GuildConv(commands.Converter):
+    async def convert(self, ctx, guild):
+        if guild.isdigit():
+            return next(
+                (i for i in ctx.bot.guilds if int(guild) == i.id),
+                None
+            )
+        return next(
+            (i for i in ctx.bot.guilds if guild == i.name),
+            None
+            )
+
+
 class Mod(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -46,6 +59,23 @@ class Mod(commands.Cog):
             header_icon=ctx.guild.icon_url,
             footer_default=True
         )
+
+    @commands.group(
+        invoke_without_command=True
+    )
+    async def leave(self, ctx):
+        await ctx.guild.leave()
+
+    @leave.command(
+        name='guild',
+        hidden=True
+    )
+    async def owner_leave(self, ctx, guild: GuildConv):
+        if await ctx.bot.is_owner(ctx.author):
+            if guild:
+                await guild.leave()
+                return
+            await ctx.send("Guild doesn't exsist.")
 
 
 def setup(client):

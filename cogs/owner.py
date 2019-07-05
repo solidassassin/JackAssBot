@@ -140,6 +140,16 @@ class Owner(commands.Cog):
         output = '\n'.join(output)
         await ctx.send(f'```ini\n{output}\n```')
 
+    @commands.command(
+        name='guilds'
+    )
+    async def list_guilds(self, ctx):
+        bot_guilds = '\n'.join(
+            f'Name: {i.name}, Id: {i.id}'
+            for i in self.client.guilds
+        )
+        await ctx.send(f'```{bot_guilds}```')
+
 
 def setup(client):
     client.add_cog(Owner(client))
