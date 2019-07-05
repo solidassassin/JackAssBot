@@ -26,6 +26,7 @@ class Owner(commands.Cog):
         """
         Powerfull git commands to manage the bot.
         """
+        await ctx.trigger_typing()
         try:
             output = subprocess.check_output(
                 ('git', *process)
