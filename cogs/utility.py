@@ -24,7 +24,7 @@ class Utility(commands.Cog):
         )
         return name, url, about
 
-    async def urban(self, url) -> list:
+    async def urban(self, url) -> dict:
         async with self.client.session.get(url) as r:
             if r.status != 200:
                 raise commands.CommandInvokeError(
@@ -40,12 +40,11 @@ class Utility(commands.Cog):
         for i in ('[', ']'):
             definition = definition.replace(i, '')
             example = example.replace(i, '')
-        if len(definition) > 1024:
+        if len(definition) > 1020:
             definition = f'{definition[:1020]}...'
-        fields = {
-            'Definition:': definition,
-            'Example:': example,
-        }
+        fields = {'Definition:': definition}
+        if example:
+            fields['Example'] = example
         return fields
 
     @commands.command(
@@ -114,11 +113,15 @@ class Utility(commands.Cog):
         name='definition',
         aliases=('urbandict', 'urban')
     )
-    async def urbandictionary(self, ctx, *, term):
-        url = f'http://api.urbandictionary.com/v0/define?term={quote(term)}'
+    async def urbandictionary(self, ctx, *, word):
+        """
+        Shows the definition of the provided word.
+        """
+        await ctx.trigger_typing()
+        url = f'http://api.urbandictionary.com/v0/define?term={quote(word)}'
         fields = await self.urban(url)
         await ctx.embed(
-            title=term.title(),
+            title=word.title(),
             url=url,
             color=0x1D2439,
             fields=fields,
