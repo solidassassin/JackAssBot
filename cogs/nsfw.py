@@ -68,9 +68,9 @@ class Adult(commands.Cog, name='NSFW'):
         Optional parameter: <gif> to send a gif
         """
         if gif == 'gif':
-            pic = await self.nudes('nsfw_gifs', ('gif',))
+            pic = await self.nudes('FreshGIF', ('gif',))
         else:
-            pic = await self.nudes('xsmallgirls', ('jpg', 'png'))
+            pic = await self.nudes('LegalTeens', ('jpg', 'png'))
         await ctx.embed(
             title='Teen 😉',
             color=0xf4428f,
