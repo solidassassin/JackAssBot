@@ -16,7 +16,7 @@ class Adult(commands.Cog, name='NSFW'):
                 nsfw = (i.id for i in ctx.guild.text_channels if i.is_nsfw())
                 await ctx.send(f"👉 <#{next(nsfw)}> 👌😩🍆💦")
             except StopIteration:
-                await ctx.send('No nsfw channels available in this server.')
+                await ctx.send('No `NSFW` channels. Pls make one 🍆💦')
 
     async def nudes(self, subreddit, file_type=('jpg', 'png', 'gif')):
         url = f'https://api.imgur.com/3/gallery/r/{subreddit}/new'
