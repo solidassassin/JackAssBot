@@ -2,6 +2,7 @@ import logging
 import subprocess
 
 from discord.ext import commands
+from discord import Activity
 
 
 class Owner(commands.Cog):
@@ -41,6 +42,29 @@ class Owner(commands.Cog):
             color=0xeb6200
         )
 
+    @commands.command(
+        name='status',
+        aliases=('activity',)
+    )
+    async def client_status(self, ctx, status=None, *, name=None):
+        """
+        Changes bot's status.
+        """
+        activities = ('playing', 'streaming', 'listening', 'watching')
+        url = 'https://www.twitch.tv/twitchrivals'
+        if not status:
+            await self.client.change_presence(activity=None)
+            return
+        if status.lower() not in activities:
+            raise commands.BadArgument(f'Invalid activity "{status}"')
+        await self.client.change_presence(
+            activity=Activity(
+                name=name if name else 'some shit',
+                url=url if status == activities[1] else None,
+                type=activities.index(status)
+            )
+        )
+
     @commands.group(
         name='reload',
         invoke_without_command=True
@@ -55,7 +79,10 @@ class Owner(commands.Cog):
         except commands.ExtensionError as e:
             logging.exception(f'{ext}:')
             raise commands.BadArgument(str(e))
-        await ctx.send(f'```ini\n[{ext}] reloaded```')
+        await ctx.embed(
+            title='Reload',
+            description=f'```ini\n[{ext}] reloaded```'
+        )
 
     @_reload.command(
         name='all'
@@ -74,7 +101,10 @@ class Owner(commands.Cog):
                 output.append(f'{cog} failed to reload')
                 logging.exception(f'{ext}:')
         output = '\n'.join(output)
-        await ctx.send(f'```ini\n{output}\n```')
+        await ctx.embed(
+            title='Reload',
+            description=f'```ini\n{output}\n```'
+        )
 
     @commands.group(
         name='load',
@@ -85,15 +115,17 @@ class Owner(commands.Cog):
         Loads a specified extension.
         """
         ext = f'cogs.{ext}'
-        if ext in self.client.module_list:
-            try:
-                self.client.load_extension(ext)
-                await ctx.send(f'```ini\n[{ext}] loaded\n```')
-            except commands.ExtensionError as e:
-                logging.exception(f'{ext}:')
-                raise commands.BadArgument(str(e))
-            return
-        await ctx.send("Extension doesn't exist.")
+        if ext not in self.client.module_list:
+            raise commands.BadArgument("Extension doesn't exist.")
+        try:
+            self.client.load_extension(ext)
+        except commands.ExtensionError as e:
+            logging.exception(f'{ext}:')
+            raise commands.BadArgument(str(e))
+        await ctx.embed(
+            title='Load',
+            description=f'```ini\n[{ext}] loaded\n```'
+        )
 
     @_load.command(
         name='all'
@@ -103,7 +135,10 @@ class Owner(commands.Cog):
         Loads all extensions.
         """
         output = await self.client.load_modules()
-        await ctx.send(f'```ini\n{output}\n```')
+        await ctx.embed(
+            title='Load',
+            description=f'```ini\n{output}\n```'
+        )
 
     @commands.group(
         name='unload',
@@ -114,12 +149,17 @@ class Owner(commands.Cog):
         Unloads a specified extension.
         """
         ext = f'cogs.{ext}'
+        if ext not in list(self.client.extensions):
+            raise commands.BadArgument('Extension not loaded.')
         try:
             self.client.unload_extension(ext)
-            await ctx.send(f'```ini\n[{ext}] unloaded\n```')
-        except commands.ExtensionError:
-            await ctx.send(f'```ini\n[{ext}] unload failed\n```')
+        except commands.ExtensionError as e:
             logging.exception(f'{ext} failed to unload')
+            raise commands.BadArgument(str(e))
+        await ctx.embed(
+            title='Unload',
+            description=f'```ini\n[{ext}] unloaded\n```'
+        )
 
     @_unload.command(
         name='all'
@@ -139,7 +179,10 @@ class Owner(commands.Cog):
                 output.append(f'[{cog}] failed to unload')
                 logging.exception(f'{ext}:')
         output = '\n'.join(output)
-        await ctx.send(f'```ini\n{output}\n```')
+        await ctx.embed(
+            title='Unload',
+            description=f'```ini\n{output}\n```'
+        )
 
     @commands.command(
         name='guilds'

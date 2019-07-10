@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 
-import discord
 from discord.ext import commands
 from aiohttp import ClientSession
 
@@ -28,12 +27,6 @@ class JackassBot(commands.Bot):
 
     async def on_ready(self):
         log.info(f'{self.user} is in!')
-        await self.change_presence(
-            activity=discord.Streaming(
-                name='dangerous stunts!',
-                url='https://www.twitch.tv/twitchrivals'
-            )
-        )
 
     async def process_commands(self, message):
         ctx = await self.get_context(message, cls=Context)
