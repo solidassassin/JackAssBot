@@ -38,10 +38,8 @@ class Adult(commands.Cog, name='NSFW'):
 
     @commands.command()
     async def hentai(self, ctx, gif='jpg'):
-        """
-        Sends a hentai picture.
-        Optional parameter: <gif> to send a gif
-        """
+        """Sends a hentai picture.
+        Optional parameter: <gif> to send a gif"""
         if gif.lower() == 'gif':
             url = 'https://nekos.life/api/v2/img/Random_hentai_gif'
         else:
@@ -63,10 +61,8 @@ class Adult(commands.Cog, name='NSFW'):
         name='teen',
     )
     async def teen_pic(self, ctx, gif='jpg'):
-        """
-        Sends a petite teen picture.
-        Optional parameter: <gif> to send a gif
-        """
+        """Sends a petite teen picture.
+        Optional parameter: <gif> to send a gif"""
         if gif == 'gif':
             pic = await self.nudes('FreshGIF', ('gif',))
         else:

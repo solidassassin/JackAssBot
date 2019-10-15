@@ -16,17 +16,13 @@ class Owner(commands.Cog):
         aliases=('goodbye', 'die')
     )
     async def logout(self, ctx):
-        """
-        Disables bot.
-        """
+        """Disables bot."""
         await ctx.send('See ya bitch!')
         await self.client.logout()
 
     @commands.command()
     async def git(self, ctx, *process):
-        """
-        Powerfull git commands to manage the bot.
-        """
+        """Powerfull git commands to manage the bot."""
         await ctx.trigger_typing()
         try:
             output = subprocess.check_output(
@@ -47,9 +43,7 @@ class Owner(commands.Cog):
         aliases=('activity',)
     )
     async def client_status(self, ctx, status=None, *, name=None):
-        """
-        Changes bot's status.
-        """
+        """Changes bot's status."""
         activities = ('playing', 'streaming', 'listening', 'watching')
         url = 'https://www.twitch.tv/twitchrivals'
         if not status:
@@ -70,9 +64,7 @@ class Owner(commands.Cog):
         invoke_without_command=True
     )
     async def _reload(self, ctx, *, ext):
-        """
-        Reloads an extension.
-        """
+        """Reloads an extension."""
         ext = f'cogs.{ext}'
         try:
             self.client.reload_extension(ext)
@@ -88,9 +80,7 @@ class Owner(commands.Cog):
         name='all'
     )
     async def reload_all(self, ctx):
-        """
-        Reloads all extensions.
-        """
+        """Reloads all extensions."""
         ext = list(self.client.extensions)
         output = []
         for cog in ext:
@@ -111,9 +101,7 @@ class Owner(commands.Cog):
         invoke_without_command=True
     )
     async def _load(self, ctx, *, ext):
-        """
-        Loads a specified extension.
-        """
+        """Loads a specified extension."""
         ext = f'cogs.{ext}'
         if ext not in self.client.module_list:
             raise commands.BadArgument("Extension doesn't exist.")
@@ -131,9 +119,7 @@ class Owner(commands.Cog):
         name='all'
     )
     async def load_all(self, ctx):
-        """
-        Loads all extensions.
-        """
+        """Loads all extensions."""
         output = await self.client.load_modules()
         await ctx.embed(
             title='Load',
@@ -145,9 +131,7 @@ class Owner(commands.Cog):
         invoke_without_command=True
     )
     async def _unload(self, ctx, *, ext):
-        """
-        Unloads a specified extension.
-        """
+        """Unloads a specified extension."""
         ext = f'cogs.{ext}'
         if ext not in list(self.client.extensions):
             raise commands.BadArgument('Extension not loaded.')
@@ -165,9 +149,7 @@ class Owner(commands.Cog):
         name='all'
     )
     async def unload_all(self, ctx):
-        """
-        Unloads all extensions.
-        """
+        """Unloads all extensions."""
         ext = list(self.client.extensions)
         ext.remove(__name__)
         output = []

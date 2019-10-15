@@ -51,10 +51,8 @@ class Utility(commands.Cog):
         aliases=('emoji',)
     )
     async def emote(self, ctx, emoji: discord.Emoji):
-        """
-        Enlarges the provided emoji.
-        It has to be a custom emote (not unicode).
-        """
+        """Enlarges the provided emoji.
+        It has to be a custom emote (not unicode)."""
         await ctx.embed(
             color=0xffff00,
             image=emoji.url,
@@ -72,9 +70,7 @@ class Utility(commands.Cog):
         aliases=('profile',)
     )
     async def avatar_info(self, ctx, user: discord.User):
-        """
-        Returns an image of the user's avatar
-        """
+        """Returns an image of the user's avatar"""
         await ctx.embed(
             image=user.avatar_url,
             footer_default=True
@@ -85,9 +81,7 @@ class Utility(commands.Cog):
         aliases=('latency',)
     )
     async def latency_info(self, ctx):
-        """
-        Latency of the bot in miliseconds.
-        """
+        """Latency of the bot in miliseconds."""
         ping = round(self.client.latency * 1000, 2)
         await ctx.embed(
             title=f'Pong!',
@@ -99,9 +93,7 @@ class Utility(commands.Cog):
         aliases=('charinfo', 'unicode')
     )
     async def char_send(self, ctx, char: str):
-        """
-        Provides information about the given unicode char.
-        """
+        """Provides information about the given unicode char."""
         info = await self.char_info(char)
         await ctx.embed(
             title=f'{info[0]} {char}',
@@ -114,9 +106,7 @@ class Utility(commands.Cog):
         aliases=('urbandict', 'urban')
     )
     async def urbandictionary(self, ctx, *, word):
-        """
-        Shows the definition of the provided word.
-        """
+        """Shows the definition of the provided word."""
         await ctx.trigger_typing()
         url = f'http://api.urbandictionary.com/v0/define?term={quote(word)}'
         fields = await self.urban(url)

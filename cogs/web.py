@@ -5,9 +5,6 @@ from discord.ext import commands
 
 
 class Web(commands.Cog):
-    """
-    Just web shit
-    """
     def __init__(self, client):
         self.client = client
 
@@ -66,9 +63,7 @@ class Web(commands.Cog):
         aliases=('jif', 'giphy')
     )
     async def gif_embed(self, ctx, *, gif):
-        """
-        Dispalys a specified gif.
-        """
+        """Dispalys a specified gif."""
         final = await self.giphy_results(gif)
         await ctx.embed(
             image=final,
@@ -78,10 +73,8 @@ class Web(commands.Cog):
 
     @commands.command()
     async def lmgtfy(self, ctx, *, terms):
-        """
-        For people who don't know how to use Google.
-        A.K.A lmgtfy link
-        """
+        """For people who don't know how to use Google.
+        A.K.A lmgtfy link"""
         url = f'http://lmgtfy.com/?q={quote(terms)}'
         await ctx.embed(
             title=terms,
@@ -94,9 +87,7 @@ class Web(commands.Cog):
         aliases=('search', 'find')
     )
     async def google(self, ctx, *, criteria):
-        """
-        A Google search of the provided criteria.
-        """
+        """A Google search of the provided criteria."""
         async with ctx.typing():
             info = await self.google_results(criteria)
             await ctx.embed(

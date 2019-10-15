@@ -17,29 +17,15 @@ class Fun(commands.Cog):
         aliases=('coin',)
     )
     async def coin_flip(self, ctx):
-        """
-        Flips a coin.
-        """
+        """Flips a coin."""
         flip = random.choice(('Heads', 'Tails'))
         await ctx.send(f'**{flip}**')
-
-    @commands.command(
-        aliases=('follow',),
-        hidden=True
-    )
-    async def repeat(self, ctx, *, sentence):
-        """
-        Copies everything you type after the command
-        """
-        await ctx.send(f'{ctx.author.mention} said: {sentence}')
 
     @commands.command(
         aliases=('8ball', 'question:')
     )
     async def should(self, ctx):
-        """
-        Sends a response to a yes or no question.
-        """
+        """Sends a response to a yes or no question."""
         answer = random.choice(responses)
         await ctx.send(answer)
 
@@ -47,9 +33,7 @@ class Fun(commands.Cog):
         name='fact'
     )
     async def fact(self, ctx):
-        """
-        Shows a random fact.
-        """
+        """Shows a random fact."""
         url = 'https://nekos.life/api/v2/fact'
         img_url = 'https://i.ytimg.com/vi/GD6qtc2_AQA/maxresdefault.jpg'
         async with self.client.session.get(url) as r:

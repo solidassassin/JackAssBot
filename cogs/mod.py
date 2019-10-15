@@ -23,9 +23,7 @@ class Mod(commands.Cog):
         aliases=('clean', 'delete', 'purge')
     )
     async def erase(self, ctx, amount: int):
-        """
-        Deletes a specified amount of messages.
-        """
+        """Deletes a specified amount of messages."""
         if amount > 50:
             return await ctx.send('Purge limit exceeded')
         await ctx.channel.purge(limit=amount+1)
@@ -34,9 +32,7 @@ class Mod(commands.Cog):
         name='member'
     )
     async def memberinfo(self, ctx, member: Member):
-        """
-        Provides information about the given member.
-        """
+        """Provides information about the given member."""
         fields = {
             'Username:': str(member),
             'Status:': str(member.status).title(),
