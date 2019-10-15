@@ -6,8 +6,8 @@ from discord import Activity
 
 
 class Owner(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     async def cog_check(self, ctx):
         return await ctx.bot.is_owner(ctx.author)
@@ -18,7 +18,7 @@ class Owner(commands.Cog):
     async def logout(self, ctx):
         """Disables bot."""
         await ctx.send('See ya bitch!')
-        await self.client.logout()
+        await self.bot.logout()
 
     @commands.command()
     async def git(self, ctx, *process):
@@ -47,11 +47,11 @@ class Owner(commands.Cog):
         activities = ('playing', 'streaming', 'listening', 'watching')
         url = 'https://www.twitch.tv/twitchrivals'
         if not status:
-            await self.client.change_presence(activity=None)
+            await self.bot.change_presence(activity=None)
             return
         if status.lower() not in activities:
             raise commands.BadArgument(f'Invalid activity "{status}"')
-        await self.client.change_presence(
+        await self.bot.change_presence(
             activity=Activity(
                 name=name if name else 'some shit',
                 url=url if status == activities[1] else None,
@@ -67,7 +67,7 @@ class Owner(commands.Cog):
         """Reloads an extension."""
         ext = f'cogs.{ext}'
         try:
-            self.client.reload_extension(ext)
+            self.bot.reload_extension(ext)
         except commands.ExtensionError as e:
             logging.exception(f'{ext}:')
             raise commands.BadArgument(str(e))
@@ -81,11 +81,11 @@ class Owner(commands.Cog):
     )
     async def reload_all(self, ctx):
         """Reloads all extensions."""
-        ext = list(self.client.extensions)
+        ext = list(self.bot.extensions)
         output = []
         for cog in ext:
             try:
-                self.client.reload_extension(cog)
+                self.bot.reload_extension(cog)
                 output.append(f'[{cog}] reloaded')
             except commands.ExtensionError:
                 output.append(f'{cog} failed to reload')
@@ -103,10 +103,10 @@ class Owner(commands.Cog):
     async def _load(self, ctx, *, ext):
         """Loads a specified extension."""
         ext = f'cogs.{ext}'
-        if ext not in self.client.module_list:
+        if ext not in self.bot.module_list:
             raise commands.BadArgument("Extension doesn't exist.")
         try:
-            self.client.load_extension(ext)
+            self.bot.load_extension(ext)
         except commands.ExtensionError as e:
             logging.exception(f'{ext}:')
             raise commands.BadArgument(str(e))
@@ -120,7 +120,7 @@ class Owner(commands.Cog):
     )
     async def load_all(self, ctx):
         """Loads all extensions."""
-        output = await self.client.load_modules()
+        output = await self.bot.load_modules()
         await ctx.embed(
             title='Load',
             description=f'```ini\n{output}\n```'
@@ -133,10 +133,10 @@ class Owner(commands.Cog):
     async def _unload(self, ctx, *, ext):
         """Unloads a specified extension."""
         ext = f'cogs.{ext}'
-        if ext not in list(self.client.extensions):
+        if ext not in list(self.bot.extensions):
             raise commands.BadArgument('Extension not loaded.')
         try:
-            self.client.unload_extension(ext)
+            self.bot.unload_extension(ext)
         except commands.ExtensionError as e:
             logging.exception(f'{ext} failed to unload')
             raise commands.BadArgument(str(e))
@@ -150,12 +150,12 @@ class Owner(commands.Cog):
     )
     async def unload_all(self, ctx):
         """Unloads all extensions."""
-        ext = list(self.client.extensions)
+        ext = list(self.bot.extensions)
         ext.remove(__name__)
         output = []
         for cog in ext:
             try:
-                self.client.unload_extension(cog)
+                self.bot.unload_extension(cog)
                 output.append(f'[{cog}] unloaded')
             except commands.ExtensionError:
                 output.append(f'[{cog}] failed to unload')
@@ -172,10 +172,10 @@ class Owner(commands.Cog):
     async def list_guilds(self, ctx):
         bot_guilds = '\n'.join(
             f'Name: {i.name}, Id: {i.id}'
-            for i in self.client.guilds
+            for i in self.bot.guilds
         )
         await ctx.send(f'```{bot_guilds}```')
 
 
-def setup(client):
-    client.add_cog(Owner(client))
+def setup(bot):
+    bot.add_cog(Owner(bot))

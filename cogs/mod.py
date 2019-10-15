@@ -12,8 +12,8 @@ class GuildConv(commands.Converter):
 
 
 class Mod(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     async def cog_check(self, ctx):
         return ctx.author.permissions_in(ctx.channel).manage_guild
@@ -70,5 +70,5 @@ class Mod(commands.Cog):
             await ctx.send("Guild doesn't exsist.")
 
 
-def setup(client):
-    client.add_cog(Mod(client))
+def setup(bot):
+    bot.add_cog(Mod(bot))

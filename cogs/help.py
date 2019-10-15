@@ -98,9 +98,9 @@ class CustomHelp(commands.HelpCommand):
 
 
 class Help(commands.Cog):
-    def __init__(self, client):
-        self.client = client
-        self.client.help_command = CustomHelp(
+    def __init__(self, bot):
+        self.bot = bot
+        self.bot.help_command = CustomHelp(
             command_attrs={
                 'aliases': ('info', 'commands'),
                 'help': 'This message.'
@@ -108,9 +108,9 @@ class Help(commands.Cog):
         )
 
     def cog_unload(self):
-        self.client.get_command('help').hidden = False
-        self.client.help_command = commands.DefaultHelpCommand()
+        self.bot.get_command('help').hidden = False
+        self.bot.help_command = commands.DefaultHelpCommand()
 
 
-def setup(client):
-    client.add_cog(Help(client))
+def setup(bot):
+    bot.add_cog(Help(bot))

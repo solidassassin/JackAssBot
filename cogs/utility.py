@@ -6,14 +6,14 @@ from discord.ext import commands
 
 
 class Utility(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     async def char_info(self, char):
         name = unicodedata.name(char, None)
         if name is None:
             raise commands.CommandInvokeError(
-                self.client.NO_RESULTS
+                self.bot.NO_RESULTS
             )
         code = f'{ord(char):x}'
         name_url = name.lower().replace(' ', '-')
@@ -25,15 +25,15 @@ class Utility(commands.Cog):
         return name, url, about
 
     async def urban(self, url) -> dict:
-        async with self.client.session.get(url) as r:
+        async with self.bot.session.get(url) as r:
             if r.status != 200:
                 raise commands.CommandInvokeError(
-                    self.client.BAD_RESPONSE
+                    self.bot.BAD_RESPONSE
                 )
             answer = await r.json()
         if not answer['list']:
             raise commands.CommandInvokeError(
-                self.client.NO_RESULTS
+                self.bot.NO_RESULTS
             )
         definition = answer['list'][0]['definition']
         example = answer['list'][0]['example']
@@ -82,7 +82,7 @@ class Utility(commands.Cog):
     )
     async def latency_info(self, ctx):
         """Latency of the bot in miliseconds."""
-        ping = round(self.client.latency * 1000, 2)
+        ping = round(self.bot.latency * 1000, 2)
         await ctx.embed(
             title=f'Pong!',
             description=f'🏓 `{ping}ms`'
@@ -120,5 +120,5 @@ class Utility(commands.Cog):
         )
 
 
-def setup(client):
-    client.add_cog(Utility(client))
+def setup(bot):
+    bot.add_cog(Utility(bot))

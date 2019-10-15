@@ -8,8 +8,8 @@ with open('data/languages.json') as f:
 
 
 class Code(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
         self.bad_format = "No code found, make sure you're using codeblocks"
         self.unsupported = "The specified language is not supported"
         self.lang_list = sorted(languages.keys())
@@ -55,8 +55,8 @@ class Code(commands.Cog):
             )
             return
         payload = {
-            'clientId': self.client.config.jdoodleClientId,
-            'clientSecret': self.client.config.jdoodleClientSecret,
+            'clientId': self.bot.config.jdoodleClientId,
+            'clientSecret': self.bot.config.jdoodleClientSecret,
             'script': code[0],
             'language': code[1],
             'versionIndex': code[2]
@@ -66,14 +66,14 @@ class Code(commands.Cog):
         url = 'https://api.jdoodle.com/v1/execute'
         headers = {'content-type': 'application/json'}
         async with ctx.typing():
-            async with self.client.session.post(
+            async with self.bot.session.post(
                 url,
                 data=data,
                 headers=headers
             ) as r:
                 if r.status != 200:
                     raise commands.CommandInvokeError(
-                        self.client.BAD_RESPONSE
+                        self.bot.BAD_RESPONSE
                     )
                 output = await r.json()
 
@@ -85,5 +85,5 @@ class Code(commands.Cog):
             await ctx.send(f'```\n{output["output"]}\n```')
 
 
-def setup(client):
-    client.add_cog(Code(client))
+def setup(bot):
+    bot.add_cog(Code(bot))

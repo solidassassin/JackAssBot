@@ -4,8 +4,8 @@ from discord.ext import commands
 
 
 class Adult(commands.Cog, name='NSFW'):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     async def cog_check(self, ctx):
         return ctx.channel.is_nsfw()
@@ -22,12 +22,12 @@ class Adult(commands.Cog, name='NSFW'):
         url = f'https://api.imgur.com/3/gallery/r/{subreddit}/new'
         headers = {
             'Authorization':
-            f'Client-ID {self.client.config.imgur_clientid}'
+            f'Client-ID {self.bot.config.imgur_clientid}'
         }
-        async with self.client.session.get(url, headers=headers) as r:
+        async with self.bot.session.get(url, headers=headers) as r:
             if r.status != 200:
                 raise commands.CommandInvokeError(
-                    self.client.BAD_RESPONSE
+                    self.bot.BAD_RESPONSE
                 )
             pics = await r.json()
         while True:
@@ -44,10 +44,10 @@ class Adult(commands.Cog, name='NSFW'):
             url = 'https://nekos.life/api/v2/img/Random_hentai_gif'
         else:
             url = 'https://nekos.life/api/v2/img/hentai'
-        async with self.client.session.get(url) as r:
+        async with self.bot.session.get(url) as r:
             if r.status != 200:
                 raise commands.CommandInvokeError(
-                    self.client.BAD_RESPONSE
+                    self.bot.BAD_RESPONSE
                 )
             hentai = await r.json()
         await ctx.embed(
@@ -75,5 +75,5 @@ class Adult(commands.Cog, name='NSFW'):
         )
 
 
-def setup(client):
-    client.add_cog(Adult(client))
+def setup(bot):
+    bot.add_cog(Adult(bot))

@@ -9,8 +9,8 @@ with open('data/responses.json', 'r') as f:
 
 
 class Fun(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.command(
         name='flip',
@@ -36,10 +36,10 @@ class Fun(commands.Cog):
         """Shows a random fact."""
         url = 'https://nekos.life/api/v2/fact'
         img_url = 'https://i.ytimg.com/vi/GD6qtc2_AQA/maxresdefault.jpg'
-        async with self.client.session.get(url) as r:
+        async with self.bot.session.get(url) as r:
             if r.status != 200:
                 raise commands.CommandInvokeError(
-                    self.client.BAD_RESPONSE
+                    self.bot.BAD_RESPONSE
                 )
             fact = await r.json()
         await ctx.embed(
@@ -49,5 +49,5 @@ class Fun(commands.Cog):
         )
 
 
-def setup(client):
-    client.add_cog(Fun(client))
+def setup(bot):
+    bot.add_cog(Fun(bot))

@@ -5,27 +5,27 @@ from discord.ext import commands
 
 
 class Web(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     async def giphy_results(self, gif):
         giphy_url = (
             f'http://api.giphy.com/v1/gifs/search' +
-            f'?api_key={self.client.config.giphy}' +
+            f'?api_key={self.bot.config.giphy}' +
             f'&q={quote(gif)}' +
             f'&lang=en'
         )
-        async with self.client.session.get(giphy_url) as r:
+        async with self.bot.session.get(giphy_url) as r:
             if r.status != 200:
                 raise commands.CommandInvokeError(
-                    self.client.BAD_RESPONSE
+                    self.bot.BAD_RESPONSE
                 )
             gifs = await r.json()
         try:
             gif = random.choice(gifs['data'])['images']['original']['url']
         except IndexError:
             raise commands.CommandInvokeError(
-                self.client.NO_RESULTS
+                self.bot.NO_RESULTS
             )
         return gif
 
@@ -33,18 +33,18 @@ class Web(commands.Cog):
         goog_url = (
             f'https://www.googleapis.com/customsearch/' +
             f'v1?q={quote(search)}' +
-            f'&cx={self.client.config.google_cx}' +
-            f'&key={self.client.config.google}'
+            f'&cx={self.bot.config.google_cx}' +
+            f'&key={self.bot.config.google}'
         )
-        async with self.client.session.get(goog_url) as r:
+        async with self.bot.session.get(goog_url) as r:
             if r.status != 200:
                 raise commands.CommandInvokeError(
-                    self.client.BAD_RESPONSE
+                    self.bot.BAD_RESPONSE
                 )
             search = await r.json()
         if 'items' not in search:
             raise commands.CommandInvokeError(
-                self.client.NO_RESULTS
+                self.bot.NO_RESULTS
             )
         if 'cse_thumbnail' in search['items'][0]['pagemap']:
             image = search['items'][0]['pagemap']['cse_thumbnail'][0]['src']
@@ -103,5 +103,5 @@ class Web(commands.Cog):
             )
 
 
-def setup(client):
-    client.add_cog(Web(client))
+def setup(bot):
+    bot.add_cog(Web(bot))

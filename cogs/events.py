@@ -9,8 +9,8 @@ log = logging.getLogger(__name__)
 
 
 class ErrorHandler(commands.Cog):
-    def __init__(self, client):
-        self.client = client
+    def __init__(self, bot):
+        self.bot = bot
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
@@ -49,11 +49,11 @@ class ErrorHandler(commands.Cog):
             return
 
         if isinstance(error, commands.CommandInvokeError):
-            if error.original == self.client.BAD_RESPONSE:
+            if error.original == self.bot.BAD_RESPONSE:
                 await ctx.send('Bad response from the API.')
-            elif error.original == self.client.NO_RESULTS:
+            elif error.original == self.bot.NO_RESULTS:
                 await ctx.send('No results found.')
-            elif error.original == self.client.NON_EXISTENT:
+            elif error.original == self.bot.NON_EXISTENT:
                 await ctx.send("Command/Cog doesn't exsist or unavailable.")
             else:
                 log.error(error)
@@ -77,5 +77,5 @@ class ErrorHandler(commands.Cog):
             pass
 
 
-def setup(client):
-    client.add_cog(ErrorHandler(client))
+def setup(bot):
+    bot.add_cog(ErrorHandler(bot))
