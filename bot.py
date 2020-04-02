@@ -5,7 +5,7 @@ from discord.ext import commands
 from aiohttp import ClientSession
 
 from data import config
-from cogs.extras.context import Context
+from cogs.utils.context import Context
 
 
 logging.basicConfig(
