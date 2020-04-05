@@ -1,5 +1,5 @@
 from discord.ext import commands
-from discord import Member
+from discord import Member, Role
 
 
 class GuildConv(commands.Converter):
@@ -68,6 +68,19 @@ class Mod(commands.Cog):
                 await guild.leave()
                 return
             await ctx.send("Guild doesn't exsist.")
+
+    @commands.command(
+        name='dump',
+        hidden=True
+    )
+    async def dump_(self, ctx, role: Role):
+        members = ctx.guild.members
+        output = []
+        for member in members:
+            if role in member.roles:
+                await member.kick(reason='Duplicate')
+                output.append(f'{member} was kicked')
+        await ctx.send('```' + '\n'.join(output) + '```')
 
 
 def setup(bot):
