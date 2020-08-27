@@ -51,7 +51,7 @@ class Adult(commands.Cog, name="NSFW"):
     @commands.command(
         name="teen"
     )
-    async def teen_pic(self, ctx, state="rising"):
+    async def teen_pic(self, ctx, state="new"):
         """Sends a nsfw teen picture"""
         post = await self.nudes("LegalTeens", state)
         await ctx.embed(
