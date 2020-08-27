@@ -19,9 +19,10 @@ log = logging.getLogger(__name__)
 class JackassBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.BAD_RESPONSE = -1
-        self.NO_RESULTS = -2
-        self.NON_EXISTENT = -3
+        self.error_messages = {
+            "api": "Problems connecting to the API (status code `{}`)",
+            "no_results": "No results for `{}`"
+        }
 
     @property
     def config(self):

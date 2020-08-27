@@ -10,41 +10,41 @@ class Web(commands.Cog):
 
     async def giphy_results(self, gif):
         giphy_url = (
-            f'http://api.giphy.com/v1/gifs/search' +
-            f'?api_key={self.bot.config.giphy}' +
-            f'&q={quote(gif)}' +
-            f'&lang=en'
+            "http://api.giphy.com/v1/gifs/search"
+            f"?api_key={self.bot.config.giphy}"
+            f"&q={quote(gif)}"
+            "&lang=en"
         )
         async with self.bot.session.get(giphy_url) as r:
-            if r.status != 200:
-                raise commands.CommandInvokeError(
-                    self.bot.BAD_RESPONSE
+            if (status := r.status) != 200:
+                raise commands.CommandError(
+                    self.bot.error_messages["api"].format(status)
                 )
             gifs = await r.json()
         try:
             gif = random.choice(gifs['data'])['images']['original']['url']
         except IndexError:
-            raise commands.CommandInvokeError(
-                self.bot.NO_RESULTS
+            raise commands.CommandError(
+                self.bot.error_messages["no_results"].format(gif)
             )
         return gif
 
     async def google_results(self, search):
         goog_url = (
-            f'https://www.googleapis.com/customsearch/' +
-            f'v1?q={quote(search)}' +
-            f'&cx={self.bot.config.google_cx}' +
-            f'&key={self.bot.config.google}'
+            "https://www.googleapis.com/customsearch/"
+            f"v1?q={quote(search)}"
+            f"&cx={self.bot.config.google_cx}"
+            f"&key={self.bot.config.google}"
         )
         async with self.bot.session.get(goog_url) as r:
-            if r.status != 200:
-                raise commands.CommandInvokeError(
-                    self.bot.BAD_RESPONSE
+            if (status := r.status) != 200:
+                raise commands.CommandError(
+                    self.bot.error_messages["api"].format(status)
                 )
             search = await r.json()
         if 'items' not in search:
-            raise commands.CommandInvokeError(
-                self.bot.NO_RESULTS
+            raise commands.CommandError(
+                self.bot.error_messages["no_results"].format(search)
             )
         if 'cse_thumbnail' in search['items'][0]['pagemap']:
             image = search['items'][0]['pagemap']['cse_thumbnail'][0]['src']
@@ -59,8 +59,7 @@ class Web(commands.Cog):
 
 # -----------commands--------------
     @commands.command(
-        name='gif',
-        aliases=('jif', 'giphy')
+        name="gif"
     )
     async def gif_embed(self, ctx, *, gif):
         """Dispalys a specified gif."""
@@ -94,7 +93,7 @@ class Web(commands.Cog):
                 title=info[0],
                 url=info[1],
                 description=info[2],
-                color=0x3498db,
+                color=0x04aad4,
                 thumbnail=info[3],
                 footer_text=(
                     f'Total results: {info[4]} |' +
