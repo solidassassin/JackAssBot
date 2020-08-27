@@ -19,11 +19,14 @@ log = logging.getLogger(__name__)
 class JackassBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.config = config
         self.session = None
         self.BAD_RESPONSE = -1
         self.NO_RESULTS = -2
         self.NON_EXISTENT = -3
+
+    @property
+    def config(self):
+        return config
 
     async def on_ready(self):
         log.info(f'{self.user} is in!')
