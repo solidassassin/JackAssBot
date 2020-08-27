@@ -15,40 +15,41 @@ class Utility(commands.Cog):
             raise commands.CommandInvokeError(
                 self.bot.NO_RESULTS
             )
-        code = f'{ord(char):x}'
-        name_url = name.lower().replace(' ', '-')
-        url = f'https://emojipedia.org/{name_url}'
+        code = f"{ord(char):x}"
+        name_url = name.lower().replace(" ", "-")
+        url = f"https://emojipedia.org/{name_url}"
         about = (
-            f'**Hex:** {code}\n'
-            f'**Python:** \\N{{{name}}}'
+            f"**Hex:** {code}\n"
+            f"**Python:** \\N{{{name}}}"
         )
         return name, url, about
 
-    async def urban(self, url) -> dict:
+    async def urban(self, word) -> dict:
+        url = f"http://api.urbandictionary.com/v0/define?term={quote(word)}"
         async with self.bot.session.get(url) as r:
-            if r.status != 200:
-                raise commands.CommandInvokeError(
-                    self.bot.BAD_RESPONSE
+            if (status := r.status) != 200:
+                raise commands.CommandError(
+                    self.bot.error_messages["api"].format(status)
                 )
             answer = await r.json()
-        if not answer['list']:
-            raise commands.CommandInvokeError(
-                self.bot.NO_RESULTS
+        if not answer["list"]:
+            raise commands.CommandError(
+                self.bot.error_messages["no_results"].format(word)
             )
-        definition = answer['list'][0]['definition']
-        example = answer['list'][0]['example']
-        for i in ('[', ']'):
-            definition = definition.replace(i, '')
-            example = example.replace(i, '')
+        definition = answer["list"][0]["definition"]
+        example = answer["list"][0]["example"]
+        for i in ("[", "]"):
+            definition = definition.replace(i, "")
+            example = example.replace(i, "")
         if len(definition) > 1020:
-            definition = f'{definition[:1020]}...'
-        fields = {'Definition:': definition}
+            definition = f"{definition[:1020]}..."
+        fields = {"Definition:": definition}
         if example:
-            fields['Example'] = example
-        return fields
+            fields["Example:"] = example
+        return fields, url
 
     @commands.command(
-        aliases=('emoji',)
+        aliases=("emoji",)
     )
     async def emote(self, ctx, emoji: discord.Emoji):
         """Enlarges the provided emoji.
@@ -62,12 +63,12 @@ class Utility(commands.Cog):
     @emote.error
     async def info_error(self, ctx, error):
         if isinstance(error, commands.BadArgument):
-            await ctx.send('I only support custom emotes')
-            await ctx.message.add_reaction('❌')
+            await ctx.send("I only support custom emotes")
+            await ctx.message.add_reaction("❌")
 
     @commands.command(
-        name='avatar',
-        aliases=('profile',)
+        name="avatar",
+        aliases=("profile",)
     )
     async def avatar_info(self, ctx, user: discord.User):
         """Returns an image of the user's avatar"""
@@ -77,20 +78,20 @@ class Utility(commands.Cog):
         )
 
     @commands.command(
-        name='ping',
-        aliases=('latency',)
+        name="ping",
+        aliases=("latency",)
     )
     async def latency_info(self, ctx):
         """Latency of the bot in miliseconds."""
         ping = round(self.bot.latency * 1000, 2)
         await ctx.embed(
-            title=f'Pong!',
-            description=f'🏓 `{ping}ms`'
+            title=f"Pong!",
+            description=f"🏓 `{ping}ms`"
         )
 
     @commands.command(
-        name='char',
-        aliases=('charinfo', 'unicode')
+        name="char",
+        aliases=("charinfo", "unicode")
     )
     async def char_send(self, ctx, char: str):
         """Provides information about the given unicode char."""
@@ -102,14 +103,13 @@ class Utility(commands.Cog):
         )
 
     @commands.command(
-        name='definition',
-        aliases=('urbandict', 'urban')
+        name="definition",
+        aliases=("urbandict", "urban")
     )
     async def urbandictionary(self, ctx, *, word):
         """Shows the definition of the provided word."""
         await ctx.trigger_typing()
-        url = f'http://api.urbandictionary.com/v0/define?term={quote(word)}'
-        fields = await self.urban(url)
+        fields, url = await self.urban(word)
         await ctx.embed(
             title=word.title(),
             url=url,
