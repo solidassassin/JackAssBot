@@ -6,6 +6,7 @@ from discord.ext import commands
 class Adult(commands.Cog, name='NSFW'):
     def __init__(self, bot):
         self.bot = bot
+        self.error_message = "Problems connecting to the API (status code `{}`)"
 
     async def cog_check(self, ctx):
         return ctx.channel.is_nsfw()
@@ -25,9 +26,9 @@ class Adult(commands.Cog, name='NSFW'):
             f'Client-ID {self.bot.config.imgur_clientid}'
         }
         async with self.bot.session.get(url, headers=headers) as r:
-            if r.status != 200:
-                raise commands.CommandInvokeError(
-                    self.bot.BAD_RESPONSE
+            if (status := r.status) != 200:
+                raise commands.CommandError(
+                    self.error_message.format(status)
                 )
             pics = await r.json()
         while True:
@@ -45,9 +46,9 @@ class Adult(commands.Cog, name='NSFW'):
         else:
             url = 'https://nekos.life/api/v2/img/hentai'
         async with self.bot.session.get(url) as r:
-            if r.status != 200:
-                raise commands.CommandInvokeError(
-                    self.bot.BAD_RESPONSE
+            if (status := r.status) != 200:
+                raise commands.CommandError(
+                    self.error_message.format(status)
                 )
             hentai = await r.json()
         await ctx.embed(
