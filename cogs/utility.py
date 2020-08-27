@@ -59,12 +59,6 @@ class Utility(commands.Cog):
             image=emoji.url,
             footer_default=True
         )
-    # fix dis
-    @emote.error
-    async def info_error(self, ctx, error):
-        if isinstance(error, commands.BadArgument):
-            await ctx.send("I only support custom emotes")
-            await ctx.message.add_reaction("❌")
 
     @commands.command(
         name="avatar",
