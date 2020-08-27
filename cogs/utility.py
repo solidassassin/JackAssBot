@@ -91,7 +91,7 @@ class Utility(commands.Cog):
         """Provides information about the given unicode char."""
         info = await self.char_info(char)
         await ctx.embed(
-            title=f'{info[0]} {char}',
+            title=f"{info[0]} {char}",
             url=info[1],
             description=info[2]
         )

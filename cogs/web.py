@@ -22,7 +22,7 @@ class Web(commands.Cog):
                 )
             gifs = await r.json()
         try:
-            gif = random.choice(gifs['data'])['images']['original']['url']
+            gif = random.choice(gifs["data"])["images"]["original"]["url"]
         except IndexError:
             raise commands.CommandError(
                 self.bot.error_messages["no_results"].format(gif)
@@ -42,19 +42,19 @@ class Web(commands.Cog):
                     self.bot.error_messages["api"].format(status)
                 )
             search = await r.json()
-        if 'items' not in search:
+        if "items" not in search:
             raise commands.CommandError(
                 self.bot.error_messages["no_results"].format(search)
             )
-        if 'cse_thumbnail' in search['items'][0]['pagemap']:
-            image = search['items'][0]['pagemap']['cse_thumbnail'][0]['src']
+        if "cse_thumbnail" in search["items"][0]["pagemap"]:
+            image = search["items"][0]["pagemap"]["cse_thumbnail"][0]["src"]
         else:
             image = None
-        title = search['items'][0]['title']
-        link = search['items'][0]['link']
-        snippet = search['items'][0]['snippet']
-        timing = search['searchInformation']['formattedSearchTime']
-        results = search['searchInformation']['totalResults']
+        title = search["items"][0]["title"]
+        link = search["items"][0]["link"]
+        snippet = search["items"][0]["snippet"]
+        timing = search["searchInformation"]["formattedSearchTime"]
+        results = search["searchInformation"]["totalResults"]
         return title, link, snippet, image, results, timing
 
 # -----------commands--------------
@@ -74,7 +74,7 @@ class Web(commands.Cog):
     async def lmgtfy(self, ctx, *, terms):
         """For people who don't know how to use Google.
         A.K.A lmgtfy link"""
-        url = f'http://lmgtfy.com/?q={quote(terms)}'
+        url = f"http://lmgtfy.com/?q={quote(terms)}"
         await ctx.embed(
             title=terms,
             url=url,
@@ -82,8 +82,8 @@ class Web(commands.Cog):
         )
 
     @commands.command(
-        name='google',
-        aliases=('search', 'find')
+        name="google",
+        aliases=("search", "find")
     )
     async def google(self, ctx, *, criteria):
         """A Google search of the provided criteria."""
@@ -96,8 +96,8 @@ class Web(commands.Cog):
                 color=0x04aad4,
                 thumbnail=info[3],
                 footer_text=(
-                    f'Total results: {info[4]} |' +
-                    f' Search time: {info[5]} seconds'
+                    f"Total results: {info[4]} i|"
+                    f" Search time: {info[5]} seconds"
                 )
             )
 

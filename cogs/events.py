@@ -24,13 +24,13 @@ class ErrorHandler(commands.Cog):
             return
 
         if isinstance(error, commands.CheckFailure):
-            await ctx.message.add_reaction('⛔')
-            log.info(f'{ctx.author} was denied permissions to {ctx.command}')
+            await ctx.message.add_reaction("⛔")
+            log.info(f"{ctx.author} was denied permissions to {ctx.command}")
             return
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send_help(ctx.command)
-            await ctx.message.add_reaction('❌')
+            await ctx.message.add_reaction("❌")
             return
 
         e = Embed(
@@ -67,7 +67,7 @@ class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
         try:
-            await ctx.message.add_reaction('✅')
+            await ctx.message.add_reaction("✅")
         except NotFound:
             pass
 
