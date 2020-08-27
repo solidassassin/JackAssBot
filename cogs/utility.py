@@ -11,9 +11,9 @@ class Utility(commands.Cog):
 
     async def char_info(self, char):
         name = unicodedata.name(char, None)
-        if name is None:
-            raise commands.CommandInvokeError(
-                self.bot.NO_RESULTS
+        if not name:
+            raise commands.CommandError(
+                self.bot.error_messages["no_results"].format(char)
             )
         code = f"{ord(char):x}"
         name_url = name.lower().replace(" ", "-")
