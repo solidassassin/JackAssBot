@@ -96,7 +96,7 @@ class Web(commands.Cog):
                 color=0x04aad4,
                 thumbnail=info[3],
                 footer_text=(
-                    f"Total results: {info[4]} i|"
+                    f"Total results: {info[4]} |"
                     f" Search time: {info[5]} seconds"
                 )
             )
