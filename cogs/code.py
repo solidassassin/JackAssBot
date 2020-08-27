@@ -24,7 +24,6 @@ class Code(commands.Cog):
 
         if not data:
             raise commands.BadArgument("No text detected.")
-        print(data)
         lang = data[0] or data[1]
 
         if not (code := data[2]):
