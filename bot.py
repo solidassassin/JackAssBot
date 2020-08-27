@@ -32,7 +32,7 @@ class JackassBot(commands.Bot):
         log.info(f"{self.user} is in!")
 
     async def get_context(self, message, *, cls=Context):
-        return await self.get_context(message, cls=cls)
+        return await super().get_context(message, cls=cls)
 
     @property
     def module_list(self):
