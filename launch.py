@@ -4,7 +4,7 @@ from bot import JackassBot
 
 
 bot = JackassBot(
-    command_prefix=when_mentioned_or("jack ", "Jack "),
+    command_prefix=when_mentioned_or("dad ", "Dad "),
     case_insensitive=True
 )
 
