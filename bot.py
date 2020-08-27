@@ -53,7 +53,9 @@ class JackassBot(commands.Bot):
                 log.exception(f'Failed to load {cog}')
         return '\n'.join(_output)
 
-    async def start(self, token=self.config.token):
+    async def start(self, token: str = None):
+        if not token:
+            token = self.config.token
         self.session = ClientSession()
         await self.load_modules()
         await super().start(token)
