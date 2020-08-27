@@ -69,19 +69,6 @@ class Mod(commands.Cog):
                 return
             await ctx.send("Guild doesn't exsist.")
 
-    @commands.command(
-        name='dump',
-        hidden=True
-    )
-    async def dump_(self, ctx, role: Role):
-        members = ctx.guild.members
-        output = []
-        for member in members:
-            if role in member.roles:
-                await member.kick(reason='Duplicate')
-                output.append(f'{member} was kicked')
-        await ctx.send('```' + '\n'.join(output) + '```')
-
 
 def setup(bot):
     bot.add_cog(Mod(bot))
