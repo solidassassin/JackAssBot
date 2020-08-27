@@ -1,6 +1,6 @@
 # JackAssBot
 
-[![python-version](https://img.shields.io/badge/python-3.6+-1f425f.svg)](https://www.python.org/)
+[![python-version](https://img.shields.io/badge/python-3.8+-1f425f.svg)](https://www.python.org/)
 [![discord.py-version](https://img.shields.io/badge/discord.py-1.0.0+-6665d2.svg)](https://discordpy.readthedocs.io/en/latest/)
 ![license](https://img.shields.io/github/license/solidassassin/JackAssBot.svg)
 
@@ -22,7 +22,7 @@ If the mentioned downfalls aren't a problem for you, then you're more than welco
 
 ## Setup
 
-As mentioned above `python-3.6+` and `discord.py-1.0.0+` are required for the bot to run. Python's installation process will vary on the operating system you're using (I'll leave that up to you). You might also need to install `git` depending on your operating system. The required modules can be installed from `requirements.txt` with `pip`.
+As mentioned above `python-3.8+` and `discord.py-1.0.0+` are required for the bot to run. Python's installation process will vary on the operating system you're using (I'll leave that up to you). You might also need to install `git` depending on your operating system. The required modules can be installed from `requirements.txt` with `pip`.
 
 ```console
 git clone https://github.com/solidassassin/JackAssBot.git
