@@ -43,10 +43,10 @@ class Code(commands.Cog):
         language, code = self.process_input(ctx.message.clean_content)
 
         url = "https://emkc.org/api/v1/piston/execute"
-        data = json.dumps({
+        data = {
             "language": language,
             "source": code
-        })
+        }
 
         async with self.bot.session.post(url, data=data) as r:
             if (status := r.status) != 200:
@@ -54,10 +54,12 @@ class Code(commands.Cog):
                     self.bot.error_messages["api"].format(status)
                 )
             response = await r.json()
-        if len((output := response['output'])) > 1980:
+        if len((output := response["output"])) > 1980:
             output = output[:1980]
+        if len((splited := output.split("\n"))) > 40:
+            output = "\n".join(splited[:40])
 
-        await ctx.send(f"```\n{output}\n```")
+        await ctx.send(f"```\n{output}\n...\n```")
 
 
 def setup(bot):
