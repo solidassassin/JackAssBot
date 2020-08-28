@@ -9,6 +9,7 @@
     "cs": "csharp",
     "el": "emacs",
     "elisp": "emacs",
+    "exs": "elixir",
     "go": "go",
     "java": "java",
     "jl": "julia",
