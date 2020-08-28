@@ -20,10 +20,10 @@ class Code(commands.Cog):
         data = re.search(
             r"(?:\b\w+\b[\s\r\n]*){2}(\w+)?[\s\r\n]```(?:(\w+)\n)?(.+)```",
             content, re.S
-        ).groups()
-
+        )
         if not data:
             raise commands.BadArgument("No text detected.")
+        data = data.groups()
         lang = data[0] or data[1]
 
         if not (code := data[2]):
