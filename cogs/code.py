@@ -55,7 +55,7 @@ class Code(commands.Cog):
                 )
             response = await r.json()
         if len((output := response['output'])) > 1980:
-            output = output[1980:]
+            output = output[:1980]
 
         await ctx.send(f"```\n{output}\n```")
 
