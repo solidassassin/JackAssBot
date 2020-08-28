@@ -28,7 +28,7 @@ class CustomHelp(commands.HelpCommand):
             )
         if footer:
             embed.set_footer(
-                text="Use jack help <command/category> for more information."
+                text="Use dad help <command/category> for more information."
             )
         await destination.send(embed=embed)
 
