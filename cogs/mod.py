@@ -20,28 +20,28 @@ class Mod(commands.Cog):
 
     @commands.cooldown(2, 300)
     @commands.command(
-        aliases=('clean', 'delete', 'purge')
+        aliases=("clean", "delete", "purge")
     )
     async def erase(self, ctx, amount: int):
         """Deletes a specified amount of messages."""
         if amount > 50:
-            return await ctx.send('Purge limit exceeded')
+            return await ctx.send("Purge limit exceeded")
         await ctx.channel.purge(limit=amount+1)
 
     @commands.command(
-        name='member'
+        name="member"
     )
     async def memberinfo(self, ctx, member: Member):
         """Provides information about the given member."""
         fields = {
-            'Username:': str(member),
-            'Status:': str(member.status).title(),
-            'Account created at:': member.created_at.strftime("%Y/%m/%d"),
-            'Top role:': member.top_role.mention
-            if str(member.top_role) != '@everyone' else '@everyone',
-            'Joined at:': member.joined_at.strftime("%Y/%m/%d"),
-            'Current activities:': '\n'.join(i.name for i in member.activities)
-            if member.activities else 'No current activities'
+            "Username:": str(member),
+            "Status:": str(member.status).title(),
+            "Account created at:": member.created_at.strftime("%Y/%m/%d"),
+            "Top role:": member.top_role.mention
+            if str(member.top_role) != "@everyone" else "@everyone",
+            "Joined at:": member.joined_at.strftime("%Y/%m/%d"),
+            "Current activities:": "\n".join(i.name for i in member.activities)
+            if member.activities else "No current activities"
         }
         await ctx.embed(
             color=member.color,
@@ -59,7 +59,7 @@ class Mod(commands.Cog):
         await ctx.guild.leave()
 
     @leave.command(
-        name='guild',
+        name="guild",
         hidden=True
     )
     async def owner_leave(self, ctx, guild: GuildConv):
@@ -68,19 +68,6 @@ class Mod(commands.Cog):
                 await guild.leave()
                 return
             await ctx.send("Guild doesn't exsist.")
-
-    @commands.command(
-        name='dump',
-        hidden=True
-    )
-    async def dump_(self, ctx, role: Role):
-        members = ctx.guild.members
-        output = []
-        for member in members:
-            if role in member.roles:
-                await member.kick(reason='Duplicate')
-                output.append(f'{member} was kicked')
-        await ctx.send('```' + '\n'.join(output) + '```')
 
 
 def setup(bot):

@@ -1,6 +1,7 @@
 import logging
 import traceback
 
+from discord import Embed
 from discord.ext import commands
 from discord.errors import NotFound
 
@@ -23,47 +24,41 @@ class ErrorHandler(commands.Cog):
             return
 
         if isinstance(error, commands.CheckFailure):
-            await ctx.message.add_reaction('⛔')
-            log.info(f'{ctx.author} was denied permissions to {ctx.command}')
+            await ctx.message.add_reaction("⛔")
+            log.info(f"{ctx.author} was denied permissions to {ctx.command}")
             return
 
         if isinstance(error, commands.MissingRequiredArgument):
             await ctx.send_help(ctx.command)
-            await ctx.message.add_reaction('❌')
+            await ctx.message.add_reaction("❌")
             return
 
+        e = Embed(
+            title="Error",
+            color=0xFF0000
+        )
+        e.set_footer(
+            text=ctx.author.display_name,
+            icon_url=ctx.author.avatar_url
+        )
+
         if isinstance(error, commands.BotMissingPermissions):
-            await ctx.send(
-                f"Looks like I don't have enough" +
-                f" permissions to execute {ctx.command}. " +
-                f"Give me more POWER!"
+            e.description = (
+                "Looks like I don't have enough"
+                f" permissions to execute {ctx.command}. "
+                "Be a gentleman and give me more power."
             )
+            await ctx.send(embed=e)
             return
 
         if isinstance(error, commands.BadArgument):
-            await ctx.embed(
-                title='Error',
-                description=str(error),
-                color=0xFF0000
-            )
-            return
-
-        if isinstance(error, commands.CommandInvokeError):
-            if error.original == self.bot.BAD_RESPONSE:
-                await ctx.send('Bad response from the API.')
-            elif error.original == self.bot.NO_RESULTS:
-                await ctx.send('No results found.')
-            elif error.original == self.bot.NON_EXISTENT:
-                await ctx.send("Command/Cog doesn't exsist or unavailable.")
-            else:
-                log.error(error)
-                traceback.print_exception(
-                    type(error), error, error.__traceback__
-                )
-            await ctx.message.add_reaction('❗')
+            e.description = str(error)
+            await ctx.send(embed=e)
             return
 
         if isinstance(error, commands.CommandError):
+            e.description = str(error)
+            await ctx.send(embed=e)
             log.error(error)
             traceback.print_exception(
                 type(error), error, error.__traceback__
@@ -72,7 +67,7 @@ class ErrorHandler(commands.Cog):
     @commands.Cog.listener()
     async def on_command_completion(self, ctx):
         try:
-            await ctx.message.add_reaction('✅')
+            await ctx.message.add_reaction("✅")
         except NotFound:
             pass
 

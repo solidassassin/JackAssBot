@@ -1,88 +1,61 @@
 import json
+import re
+import typing
 
+from discord import Embed
 from discord.ext import commands
 
 
-with open('data/languages.json') as f:
+with open("data/languages.json") as f:
     languages = json.load(f)
 
 
 class Code(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bad_format = "No code found, make sure you're using codeblocks"
-        self.unsupported = "The specified language is not supported"
-        self.lang_list = sorted(languages.keys())
+        self.aliases = languages.keys()
+        self.lang_set = set([*self.aliases, *languages.values()])
 
-    async def block_cleanup(self, user_input):
-        try:
-            params = user_input.split('\n', 1)
-            language = params[0].strip().lower()
-            block = params[1]
-        except ValueError:
-            raise commands.BadArgument(self.bad_format)
+    def process_input(self, content):
+        data = re.search(
+            r"(?:\b\w+\b[\s\r\n]*){2}(\w+)?[\s\r\n]```(?:(\w+)\n)?(.+)```",
+            content, re.S
+        ).groups()
 
-        if not (block.startswith('```') and block.endswith('```')):
-            raise commands.BadArgument(self.bad_format)
-        else:
-            block_strip = block.split('\n')[1:-1]
-            block_clean = '\n'.join(block_strip)
-        if language not in self.lang_list:
-            return self.unsupported
-        else:
-            version = languages[language]
-        return block_clean, language, version
+        if not data:
+            raise commands.BadArgument("No text detected.")
+        lang = data[0] or data[1]
+
+        if not (code := data[2]):
+            raise commands.BadArgument("No code present.")
+        if not (lang and lang in self.lang_set):
+            raise commands.BadArgument("Unsupported language provided.")
+        if lang in self.aliases:
+            lang = languages[lang]
+
+        return lang, code
 
     @commands.command(
-        name='run',
-        aliases=('execute', 'code')
+        aliases=("execute", "code")
     )
-    async def jdoodle(self, ctx, *, code_raw):
-        """
-        A command to execute your provided code.
-        Example input:
-        *jack run python3
-        \\`\\`\\`[language here]
-        print('Hello world!')
-        \\`\\`\\`*
-        """
-        code = await self.block_cleanup(code_raw)
-        if code == self.unsupported:
-            await ctx.send(
-                f"{self.unsupported}\n" +
-                f"Here's a list of supported languages:\n" +
-                f"```{', '.join(self.lang_list)}```"
-            )
-            return
-        payload = {
-            'clientId': self.bot.config.jdoodleClientId,
-            'clientSecret': self.bot.config.jdoodleClientSecret,
-            'script': code[0],
-            'language': code[1],
-            'versionIndex': code[2]
-        }
-        data = json.dumps(payload)
+    async def run(self, ctx):
+        """Executes user code."""
+        language, code = self.process_input(ctx.message.clean_content)
 
-        url = 'https://api.jdoodle.com/v1/execute'
-        headers = {'content-type': 'application/json'}
-        async with ctx.typing():
-            async with self.bot.session.post(
-                url,
-                data=data,
-                headers=headers
-            ) as r:
-                if r.status != 200:
-                    raise commands.CommandInvokeError(
-                        self.bot.BAD_RESPONSE
-                    )
-                output = await r.json()
+        url = "https://emkc.org/api/v1/piston/execute"
+        data = json.dumps({
+            "language": language,
+            "source": code
+        })
 
-            if len(output) > 1990:
-                await ctx.send(
-                    f'Sorry {ctx.author.mention}, your output is too long.'
+        async with self.bot.session.post(url, data=data) as r:
+            if (status := r.status) != 200:
+                raise commands.CommandError(
+                    self.bot.error_messages["api"].format(status)
                 )
-                return
-            await ctx.send(f'```\n{output["output"]}\n```')
+            response = await r.json()
+
+        await ctx.send(f"```\n{response['output']}\n```")
 
 
 def setup(bot):
