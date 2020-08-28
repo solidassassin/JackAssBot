@@ -54,8 +54,10 @@ class Code(commands.Cog):
                     self.bot.error_messages["api"].format(status)
                 )
             response = await r.json()
+        if len((output := response['output'])) > 1980:
+            output = output[1980:]
 
-        await ctx.send(f"```\n{response['output']}\n```")
+        await ctx.send(f"```\n{output}\n```")
 
 
 def setup(bot):
