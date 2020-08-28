@@ -18,7 +18,7 @@ class Code(commands.Cog):
 
     def process_input(self, content):
         data = re.search(
-            r"(?:\b\w+\b[\s\r\n]*){2}(\w+)?[\s\r\n]```(?:(\w+)\n)?(.+)```",
+            r"(?:\b\w+\b[\s\r\n]*){2}(\w+)?[\s\r\n]+```(?:(\w+)\n)?(.+)```",
             content, re.S
         )
         if not data:
