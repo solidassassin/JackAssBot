@@ -53,9 +53,7 @@ class Web(commands.Cog):
         title = search["items"][0]["title"]
         link = search["items"][0]["link"]
         snippet = search["items"][0]["snippet"]
-        timing = search["searchInformation"]["formattedSearchTime"]
-        results = search["searchInformation"]["totalResults"]
-        return title, link, snippet, image, results, timing
+        return title, link, snippet, image
 
 # -----------commands--------------
     @commands.command(
@@ -95,10 +93,7 @@ class Web(commands.Cog):
                 description=info[2],
                 color=0x04aad4,
                 thumbnail=info[3],
-                footer_text=(
-                    f"Total results: {info[4]} |"
-                    f" Search time: {info[5]} seconds"
-                )
+                footer_default=True
             )
 
 
