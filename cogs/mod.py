@@ -31,8 +31,10 @@ class Mod(commands.Cog):
     @commands.command(
         name="member"
     )
-    async def memberinfo(self, ctx, member: Member):
+    async def memberinfo(self, ctx, member: Member = None):
         """Provides information about the given member."""
+        if not member:
+            member = ctx.author
         fields = {
             "Username:": str(member),
             "Status:": str(member.status).title(),

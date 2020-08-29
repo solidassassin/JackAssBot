@@ -1,7 +1,7 @@
 import unicodedata
 from urllib.parse import quote
 
-import discord
+from discord import Emoji, Member
 from discord.ext import commands
 
 
@@ -51,7 +51,7 @@ class Utility(commands.Cog):
     @commands.command(
         aliases=("emoji",)
     )
-    async def emote(self, ctx, emoji: discord.Emoji):
+    async def emote(self, ctx, emoji: Emoji):
         """Enlarges the provided emoji.
         It has to be a custom emote (not unicode)."""
         await ctx.embed(
@@ -64,8 +64,10 @@ class Utility(commands.Cog):
         name="avatar",
         aliases=("profile",)
     )
-    async def avatar_info(self, ctx, user: discord.User):
+    async def avatar_info(self, ctx, member: Member = None):
         """Returns an image of the user's avatar"""
+        if not member:
+            member = ctx.author
         await ctx.embed(
             image=user.avatar_url,
             footer_default=True
