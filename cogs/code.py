@@ -55,11 +55,11 @@ class Code(commands.Cog):
                 )
             response = await r.json()
         if len((output := response["output"])) > 1980:
-            output = output[:1980]
+            output = output[:1980] + "\n..."
         if len((splited := output.split("\n"))) > 40:
             output = "\n".join(splited[:40])
 
-        await ctx.send(f"```\n{output}\n...\n```")
+        await ctx.send(f"```\n{output}\n```")
 
 
 def setup(bot):
