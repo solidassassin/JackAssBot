@@ -69,7 +69,7 @@ class Utility(commands.Cog):
         if not member:
             member = ctx.author
         await ctx.embed(
-            image=user.avatar_url,
+            image=member.avatar_url,
             footer_default=True
         )
 
