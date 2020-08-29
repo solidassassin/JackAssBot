@@ -74,6 +74,30 @@ class Utility(commands.Cog):
         )
 
     @commands.command(
+        aliases=("member",)
+    )
+    async def memberinfo(self, ctx, member: Member = None):
+        """Provides information about the given member."""
+        if not member:
+            member = ctx.author
+        fields = {
+            "Username:": str(member),
+            "Status:": str(member.status).title(),
+            "Account created at:": member.created_at.strftime("%Y/%m/%d"),
+            "Top role:": member.top_role.mention
+            if str(member.top_role) != "@everyone" else "@everyone",
+            "Joined at:": member.joined_at.strftime("%Y/%m/%d"),
+            "Current activities:": "\n".join(i.name for i in member.activities)
+            if member.activities else "No current activities"
+        }
+        await ctx.embed(
+            color=member.color,
+            thumbnail=member.avatar_url,
+            fields=fields,
+            footer_default=True
+        )
+
+    @commands.command(
         name="ping",
         aliases=("latency",)
     )

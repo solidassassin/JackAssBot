@@ -28,32 +28,6 @@ class Mod(commands.Cog):
             return await ctx.send("Purge limit exceeded")
         await ctx.channel.purge(limit=amount+1)
 
-    @commands.command(
-        name="member"
-    )
-    async def memberinfo(self, ctx, member: Member = None):
-        """Provides information about the given member."""
-        if not member:
-            member = ctx.author
-        fields = {
-            "Username:": str(member),
-            "Status:": str(member.status).title(),
-            "Account created at:": member.created_at.strftime("%Y/%m/%d"),
-            "Top role:": member.top_role.mention
-            if str(member.top_role) != "@everyone" else "@everyone",
-            "Joined at:": member.joined_at.strftime("%Y/%m/%d"),
-            "Current activities:": "\n".join(i.name for i in member.activities)
-            if member.activities else "No current activities"
-        }
-        await ctx.embed(
-            color=member.color,
-            thumbnail=member.avatar_url,
-            fields=fields,
-            header_text=ctx.guild.name,
-            header_icon=ctx.guild.icon_url,
-            footer_default=True
-        )
-
     @commands.group(
         invoke_without_command=True
     )
