@@ -1,8 +1,7 @@
 import json
 import re
-import typing
 
-from discord import Embed
+from collections import OrderedDict
 from discord.ext import commands
 
 
@@ -15,6 +14,8 @@ class Code(commands.Cog):
         self.bot = bot
         self.aliases = languages.keys()
         self.lang_set = set([*self.aliases, *languages.values()])
+        # message_id | response_message_object
+        self.history = OrderedDict()
 
     def process_input(self, content):
         data = re.search(
@@ -35,13 +36,7 @@ class Code(commands.Cog):
 
         return lang, code
 
-    @commands.command(
-        aliases=("execute", "code")
-    )
-    async def run(self, ctx):
-        """Executes user code."""
-        language, code = self.process_input(ctx.message.clean_content)
-
+    async def fetch_content(self, language, code):
         url = "https://emkc.org/api/v1/piston/execute"
         data = {
             "language": language,
@@ -59,7 +54,32 @@ class Code(commands.Cog):
         if len((splited := output.split("\n"))) > 40:
             output = "\n".join(splited[:40])
 
-        await ctx.send(f"```\n{output}\n```")
+        return f"```\n{output}\n```"
+
+    @commands.Cog.listener()
+    async def on_message_edit(self, _, after):
+        if (id_ := after.id) not in self.history:
+            return
+        message = self.history[id_]
+        new_content = await self.fetch_content(
+            *self.process_input(after.clean_content)
+        )
+        await message.edit(content=new_content)
+
+    @commands.command(
+        aliases=("execute", "code")
+    )
+    async def run(self, ctx):
+        """Executes user code."""
+        content = await self.fetch_content(
+            *self.process_input(ctx.message.clean_content)
+        )
+
+        msg = await ctx.send(content)
+
+        if len(self.history) >= 20:
+            self.history.popitem(last=False)
+        self.history[ctx.message.id] = msg
 
 
 def setup(bot):
