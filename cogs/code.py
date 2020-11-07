@@ -1,6 +1,7 @@
 import json
 import re
 
+from urllib.parse import quote
 from collections import OrderedDict
 from discord.ext import commands
 
@@ -42,6 +43,9 @@ class Code(commands.Cog):
             "language": language,
             "source": code
         }
+        if language in ("ltx", "latex"):
+            lnk = r"https://latex.codecogs.com/png.latex?%5Chuge%5Ccolor%7Bwhite%7D"
+            return lnk + quote(code)
 
         async with self.bot.session.post(url, data=data) as r:
             if (status := r.status) != 200:
