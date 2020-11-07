@@ -44,7 +44,7 @@ class Code(commands.Cog):
             "source": code
         }
         if language in ("ltx", "latex"):
-            lnk = r"https://latex.codecogs.com/png.latex?%5Chuge%5Ccolor%7Bwhite%7D"
+            lnk = r"https://latex.codecogs.com/png.latex?%5Clarge%5Ccolor%7Bwhite%7D"
             return lnk + quote(code)
 
         async with self.bot.session.post(url, data=data) as r:
