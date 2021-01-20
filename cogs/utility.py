@@ -41,8 +41,8 @@ class Utility(commands.Cog):
         for i in ("[", "]"):
             definition = definition.replace(i, "")
             example = example.replace(i, "")
-        if len(definition) > 1020:
-            definition = f"{definition[:1020]}..."
+        if len(definition) > 1000:
+            definition = f"{definition[:1000]}..."
         fields = {"Definition:": definition}
         if example:
             fields["Example:"] = example
