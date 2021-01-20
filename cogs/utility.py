@@ -45,6 +45,8 @@ class Utility(commands.Cog):
             definition = f"{definition[:1000]}..."
         fields = {"Definition:": definition}
         if example:
+            if len(example) > 1000:
+                example = f"{example[:1000]}..."
             fields["Example:"] = example
         return fields, url
 
