@@ -17,6 +17,8 @@
     "kotlin": "kotlin",
     "lxt": "latex",
     "node": "javascript",
+    "hs": "haskell",
+    "haskell": "haskell",
     "php": "php",
     "py": "python3",
     "python": "python3",
