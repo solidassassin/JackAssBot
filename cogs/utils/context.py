@@ -13,8 +13,9 @@ class Context(commands.Context):
             title=attrs.get("title"),
             color=attrs.get("color", Color.blurple()),
             description=attrs.get("description"),
-            url=attrs.get("url")
         )
+        if (url := attrs.get("url")):
+            e.url = url
         if "image" in attrs:
             e.set_image(url=attrs["image"])
 
