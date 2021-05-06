@@ -1,9 +1,10 @@
 FROM python:3
 
-WORKDIR /usr/src/app/JackAssBot
+WORKDIR /usr/src/app
 
-RUN git clone https://github.com/solidassassin/JackAssBot.git .
-COPY config.py ./data
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
 
 CMD [ "python", "./launch.py" ]
