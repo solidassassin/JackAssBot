@@ -39,9 +39,8 @@ google_cx = ''
 
 ### Using Docker
 
-The Docker installation is up to you. To build the image run
-`docker build -t <name> <bot root directory>`. To run the container in detached
-mode: `docker run -d <name>`.
+The Docker installation is up to you. To start the bot run: `docker-compose up -d`
+inside the root bot directory.
 
 ### On The Host
 
