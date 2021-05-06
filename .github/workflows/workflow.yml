@@ -1,0 +1,21 @@
+name: Update bot
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update repository in server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASS }}
+          script: |
+            cd projects/JackAssBot/
+            git pull origin master
+
