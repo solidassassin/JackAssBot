@@ -14,7 +14,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASS }}
           script: |
             cd projects/JackAssBot/
             git pull origin master
