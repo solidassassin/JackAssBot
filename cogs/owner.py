@@ -12,14 +12,6 @@ class Owner(commands.Cog):
     async def cog_check(self, ctx):
         return await ctx.bot.is_owner(ctx.author)
 
-    @commands.command(
-        aliases=("goodbye", "die")
-    )
-    async def logout(self, ctx):
-        """Disables bot."""
-        await ctx.send("See ya bitch!")
-        await self.bot.logout()
-
     @commands.command()
     async def git(self, ctx, *process):
         """Powerfull git commands to manage the bot."""
@@ -93,6 +85,13 @@ class Owner(commands.Cog):
             title="Reload",
             description=f"```ini\n{output}\n```"
         )
+
+    @_reload.command(
+        name="hard"
+    )
+    async def logout(self, ctx):
+        """Disables bot, reloading the container."""
+        await self.bot.logout()
 
     @commands.group(
         name="load",
