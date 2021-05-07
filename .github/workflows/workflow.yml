@@ -9,12 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Update repository in server
-        uses: fifsky/ssh-action@master
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
-          user: ${{ secrets.USERNAME }}
+          username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
-          command: |
+          passphrase: ${{ secrets.PASS }}
+          script: |
             cd projects/JackAssBot/
             git pull origin master
 
